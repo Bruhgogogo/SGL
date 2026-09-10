@@ -1,0 +1,501 @@
+#include "scene.h"
+
+namespace SGL
+{
+
+    static Scene SceneInstance;
+
+    Scene& GetSceneInstance()
+    {
+        return SceneInstance;
+    }
+
+    static Transform IdentityTransform()
+    {
+        Transform t;
+        return t;
+    }
+
+    static Transform ComposeWorld(const Transform& parentWorld, const Transform& local)
+    {
+        Transform world;
+
+        raylib::Vector3 scaled = {
+            parentWorld.scale.x * local.position.x,
+            parentWorld.scale.y * local.position.y,
+            parentWorld.scale.z * local.position.z
+        };
+
+        raylib::Vector3 rotated = raylib::Vector3RotateByQuaternion(scaled, parentWorld.rotation);
+
+        world.position = raylib::Vector3Add(parentWorld.position, rotated);
+        world.rotation = raylib::QuaternionMultiply(parentWorld.rotation, local.rotation);
+        world.scale = {
+            parentWorld.scale.x * local.scale.x,
+            parentWorld.scale.y * local.scale.y,
+            parentWorld.scale.z * local.scale.z
+        };
+
+        return world;
+    }
+
+    template <typename T>
+    int ComponentPool<T>::Find(int entity) const
+    {
+        if (entity == INVALID_HANDLE) return -1;
+        if (entity < 0) return -1;
+        if (entity >= (int)sparse.size()) return -1;
+        return sparse[entity];
+    }
+
+    template <typename T>
+    void ComponentPool<T>::Add(int entity, const T& value)
+    {
+        int index = Find(entity);
+        if (index != -1)
+        {
+            data[index] = value;
+            return;
+        }
+
+        if (entity >= (int)sparse.size())
+            sparse.resize(entity + 1, -1);
+
+        sparse[entity] = (int)data.size();
+        data.push_back(value);
+        entities.push_back(entity);
+    }
+
+    template <typename T>
+    void ComponentPool<T>::Remove(int entity)
+    {
+        int index = Find(entity);
+        if (index == -1) return;
+
+        int last = (int)data.size() - 1;
+
+        data[index] = data[last];
+        entities[index] = entities[last];
+
+        sparse[entities[index]] = index;
+        sparse[entity] = -1;
+
+        data.pop_back();
+        entities.pop_back();
+    }
+
+    template <typename T>
+    bool ComponentPool<T>::Has(int entity) const
+    {
+        return Find(entity) != -1;
+    }
+
+    template <typename T>
+    T& ComponentPool<T>::Get(int entity)
+    {
+        return data[sparse[entity]];
+    }
+
+    template <typename T>
+    const T& ComponentPool<T>::Get(int entity) const
+    {
+        return data[sparse[entity]];
+    }
+
+    template <typename T>
+    int& PoolIndex()
+    {
+        static int index = -1;
+        return index;
+    }
+
+    static std::vector<void (*)(void*, int)>& PoolRemovers()
+    {
+        static std::vector<void (*)(void*, int)> removers;
+        return removers;
+    }
+
+    template <typename T>
+    static void PoolRemoveThunk(void* pool, int entity)
+    {
+        ((ComponentPool<T>*)pool)->Remove(entity);
+    }
+
+    template <typename T>
+    ComponentPool<T>& Scene::GetPool()
+    {
+        int& index = PoolIndex<T>();
+
+        if (index == -1)
+        {
+            index = (int)pools.size();
+            pools.push_back(nullptr);
+            poolRemovers.push_back(&PoolRemoveThunk<T>);
+        }
+
+        if (pools[index] == nullptr)
+            pools[index] = new ComponentPool<T>();
+
+        return *(ComponentPool<T>*)pools[index];
+    }
+
+    template <typename T>
+    void Scene::AddComponent(int handle, const T& value)
+    {
+        if (!IsValid(handle)) return;
+        GetPool<T>().Add(handle, value);
+    }
+
+    template <typename T>
+    void Scene::RemoveComponent(int handle)
+    {
+        if (!IsValid(handle)) return;
+        GetPool<T>().Remove(handle);
+    }
+
+    template <typename T>
+    bool Scene::HasComponent(int handle) const
+    {
+        if (!IsValid(handle)) return false;
+        return ((Scene*)this)->GetPool<T>().Has(handle);
+    }
+
+    template <typename T>
+    T& Scene::GetComponent(int handle)
+    {
+        return GetPool<T>().Get(handle);
+    }
+
+    template <typename T>
+    const T& Scene::GetComponent(int handle) const
+    {
+        return ((Scene*)this)->GetPool<T>().Get(handle);
+    }
+
+    SGL_INSTANTIATE_COMPONENT(Transform);
+    SGL_INSTANTIATE_COMPONENT(Color);
+    SGL_INSTANTIATE_COMPONENT(Visible);
+
+    bool Scene::IsValid(int handle) const
+    {
+        if (handle == INVALID_HANDLE) return false;
+        if (handle < 0) return false;
+        if (handle >= (int)alive.size()) return false;
+        return alive[handle] != 0;
+    }
+
+    bool Scene::IsAlive(int handle) const
+    {
+        return IsValid(handle);
+    }
+
+    void Scene::AttachChild(int parent, int child)
+    {
+        parents[child] = parent;
+        nextSiblings[child] = firstChilds[parent];
+        prevSiblings[child] = INVALID_HANDLE;
+
+        if (nextSiblings[child] != INVALID_HANDLE)
+            prevSiblings[nextSiblings[child]] = child;
+
+        firstChilds[parent] = child;
+    }
+
+    void Scene::DetachChild(int child)
+    {
+        if (prevSiblings[child] != INVALID_HANDLE)
+            nextSiblings[prevSiblings[child]] = nextSiblings[child];
+        else if (parents[child] != INVALID_HANDLE)
+            firstChilds[parents[child]] = nextSiblings[child];
+
+        if (nextSiblings[child] != INVALID_HANDLE)
+            prevSiblings[nextSiblings[child]] = prevSiblings[child];
+
+        parents[child] = INVALID_HANDLE;
+        nextSiblings[child] = INVALID_HANDLE;
+        prevSiblings[child] = INVALID_HANDLE;
+    }
+
+    int Scene::CreateEntity()
+    {
+        int handle;
+
+        if (freeList != INVALID_HANDLE)
+        {
+            handle = freeList;
+            freeList = freeNext[handle];
+        }
+        else
+        {
+            handle = (int)alive.size();
+
+            parents.push_back(INVALID_HANDLE);
+            firstChilds.push_back(INVALID_HANDLE);
+            nextSiblings.push_back(INVALID_HANDLE);
+            prevSiblings.push_back(INVALID_HANDLE);
+            alive.push_back(0);
+            freeNext.push_back(INVALID_HANDLE);
+        }
+
+        parents[handle] = INVALID_HANDLE;
+        firstChilds[handle] = INVALID_HANDLE;
+        nextSiblings[handle] = INVALID_HANDLE;
+        prevSiblings[handle] = INVALID_HANDLE;
+        freeNext[handle] = INVALID_HANDLE;
+        alive[handle] = 1;
+
+        return handle;
+    }
+
+    void Scene::DestroyEntity(int handle)
+    {
+        if (!IsValid(handle)) return;
+
+        int c = firstChilds[handle];
+
+        while (c != INVALID_HANDLE)
+        {
+            int next = nextSiblings[c];
+            DestroyEntity(c);
+            c = next;
+        }
+
+        DetachChild(handle);
+
+        for (int i = 0; i < (int)pools.size(); i++)
+        {
+            if (pools[i] != nullptr)
+                poolRemovers[i](pools[i], handle);
+        }
+
+        firstChilds[handle] = INVALID_HANDLE;
+        nextSiblings[handle] = INVALID_HANDLE;
+        prevSiblings[handle] = INVALID_HANDLE;
+        alive[handle] = 0;
+
+        freeNext[handle] = freeList;
+        freeList = handle;
+    }
+
+    void Scene::SetParent(int child, int parent)
+    {
+        if (!IsValid(child)) return;
+        if (child == parent) return;
+
+        Transform world = IdentityTransform();
+        bool hasWorld = HasComponent<Transform>(child);
+
+        if (hasWorld)
+            world = GetComponent<Transform>(child);
+
+        DetachChild(child);
+
+        if (parent != INVALID_HANDLE && IsValid(parent))
+            AttachChild(parent, child);
+
+        if (hasWorld)
+        {
+            GetComponent<Transform>(child) = world;
+            UpdateWorld(child);
+        }
+    }
+
+    int Scene::GetParent(int handle) const
+    {
+        if (!IsValid(handle)) return INVALID_HANDLE;
+        return parents[handle];
+    }
+
+    void Scene::UpdateWorldRecursive(int handle, const Transform& parentWorld, bool hasParentWorld)
+    {
+        bool hasLocal = HasComponent<Transform>(handle);
+
+        Transform currentWorld = parentWorld;
+
+        if (hasLocal)
+        {
+            Transform& local = GetComponent<Transform>(handle);
+
+            if (hasParentWorld)
+                currentWorld = ComposeWorld(parentWorld, local);
+            else
+                currentWorld = local;
+
+            local = currentWorld;
+        }
+
+        int c = firstChilds[handle];
+
+        while (c != INVALID_HANDLE)
+        {
+            int next = nextSiblings[c];
+            UpdateWorldRecursive(c, currentWorld, hasLocal ? true : hasParentWorld);
+            c = next;
+        }
+    }
+
+    void Scene::UpdateWorld(int handle)
+    {
+        if (!IsValid(handle)) return;
+
+        bool hasLocal = HasComponent<Transform>(handle);
+
+        if (hasLocal)
+        {
+            Transform parentWorld = IdentityTransform();
+            bool hasParentWorld = false;
+
+            if (parents[handle] != INVALID_HANDLE)
+            {
+                int p = parents[handle];
+
+                if (HasComponent<Transform>(p))
+                {
+                    parentWorld = GetComponent<Transform>(p);
+                    hasParentWorld = true;
+                }
+            }
+
+            UpdateWorldRecursive(handle, parentWorld, hasParentWorld);
+        }
+        else
+        {
+            Transform parentWorld = IdentityTransform();
+            bool hasParentWorld = false;
+
+            if (parents[handle] != INVALID_HANDLE)
+            {
+                int p = parents[handle];
+
+                if (HasComponent<Transform>(p))
+                {
+                    parentWorld = GetComponent<Transform>(p);
+                    hasParentWorld = true;
+                }
+            }
+
+            int c = firstChilds[handle];
+
+            while (c != INVALID_HANDLE)
+            {
+                int next = nextSiblings[c];
+                UpdateWorldRecursive(c, parentWorld, hasParentWorld);
+                c = next;
+            }
+        }
+    }
+
+    void Scene::SetEntityPosition(int handle, float x, float y, float z)
+    {
+        if (!HasComponent<Transform>(handle)) return;
+
+        GetComponent<Transform>(handle).position = { x, y, z };
+        UpdateWorld(handle);
+    }
+
+    void Scene::GetEntityPosition(int handle, float* x, float* y, float* z)
+    {
+        if (!HasComponent<Transform>(handle)) return;
+
+        raylib::Vector3 position = GetComponent<Transform>(handle).position;
+
+        *x = position.x;
+        *y = position.y;
+        *z = position.z;
+    }
+
+    void Scene::SetEntityRotation(int handle, float pitch, float yaw, float roll)
+    {
+        if (!HasComponent<Transform>(handle)) return;
+
+        float qx, qy, qz, qw;
+        EulerToQuat(pitch, yaw, roll, qx, qy, qz, qw);
+
+        GetComponent<Transform>(handle).rotation = { qx, qy, qz, qw };
+        UpdateWorld(handle);
+    }
+
+    void Scene::GetEntityRotation(int handle, float* pitch, float* yaw, float* roll)
+    {
+        if (!HasComponent<Transform>(handle)) return;
+
+        raylib::Quaternion q = GetComponent<Transform>(handle).rotation;
+
+        QuatToEuler(q.x, q.y, q.z, q.w, *pitch, *yaw, *roll);
+    }
+
+    void Scene::SetEntityScale(int handle, float sx, float sy, float sz)
+    {
+        if (!HasComponent<Transform>(handle)) return;
+
+        GetComponent<Transform>(handle).scale = { sx, sy, sz };
+        UpdateWorld(handle);
+    }
+
+    void Scene::GetEntityScale(int handle, float* sx, float* sy, float* sz)
+    {
+        if (!HasComponent<Transform>(handle)) return;
+
+        raylib::Vector3 scale = GetComponent<Transform>(handle).scale;
+
+        *sx = scale.x;
+        *sy = scale.y;
+        *sz = scale.z;
+    }
+
+}
+
+int CreateEntity()
+{
+    return SGL::GetSceneInstance().CreateEntity();
+}
+
+void DestroyEntity(int handle)
+{
+    SGL::GetSceneInstance().DestroyEntity(handle);
+}
+
+void SetParent(int child, int parent)
+{
+    SGL::GetSceneInstance().SetParent(child, parent);
+}
+
+int GetParent(int handle)
+{
+    return SGL::GetSceneInstance().GetParent(handle);
+}
+
+void UpdateWorld(int handle)
+{
+    SGL::GetSceneInstance().UpdateWorld(handle);
+}
+
+void SetEntityPosition(int handle, float x, float y, float z)
+{
+    SGL::GetSceneInstance().SetEntityPosition(handle, x, y, z);
+}
+
+void GetEntityPosition(int handle, float* x, float* y, float* z)
+{
+    SGL::GetSceneInstance().GetEntityPosition(handle, x, y, z);
+}
+
+void SetEntityRotation(int handle, float pitch, float yaw, float roll)
+{
+    SGL::GetSceneInstance().SetEntityRotation(handle, pitch, yaw, roll);
+}
+
+void GetEntityRotation(int handle, float* pitch, float* yaw, float* roll)
+{
+    SGL::GetSceneInstance().GetEntityRotation(handle, pitch, yaw, roll);
+}
+
+void SetEntityScale(int handle, float sx, float sy, float sz)
+{
+    SGL::GetSceneInstance().SetEntityScale(handle, sx, sy, sz);
+}
+
+void GetEntityScale(int handle, float* sx, float* sy, float* sz)
+{
+    SGL::GetSceneInstance().GetEntityScale(handle, sx, sy, sz);
+}
