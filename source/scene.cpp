@@ -39,6 +39,32 @@ namespace SGL
         return world;
     }
 
+    static Transform InverseComposeWorld(const Transform& parentWorld, const Transform& world)
+    {
+        Transform local;
+
+        raylib::Quaternion invRot = raylib::QuaternionInvert(parentWorld.rotation);
+
+        raylib::Vector3 delta = raylib::Vector3Subtract(world.position, parentWorld.position);
+        raylib::Vector3 rotated = raylib::Vector3RotateByQuaternion(delta, invRot);
+
+        local.position = {
+            rotated.x / parentWorld.scale.x,
+            rotated.y / parentWorld.scale.y,
+            rotated.z / parentWorld.scale.z
+        };
+
+        local.rotation = raylib::QuaternionMultiply(invRot, world.rotation);
+
+        local.scale = {
+            world.scale.x / parentWorld.scale.x,
+            world.scale.y / parentWorld.scale.y,
+            world.scale.z / parentWorld.scale.z
+        };
+
+        return local;
+    }
+
     template <typename T>
     int ComponentPool<T>::Find(int entity) const
     {
@@ -102,17 +128,15 @@ namespace SGL
         return data[sparse[entity]];
     }
 
+    template class ComponentPool<Transform>;
+    template class ComponentPool<Color>;
+    template class ComponentPool<Visible>;
+
     template <typename T>
     int& PoolIndex()
     {
         static int index = -1;
         return index;
-    }
-
-    static std::vector<void (*)(void*, int)>& PoolRemovers()
-    {
-        static std::vector<void (*)(void*, int)> removers;
-        return removers;
     }
 
     template <typename T>
@@ -172,9 +196,23 @@ namespace SGL
         return ((Scene*)this)->GetPool<T>().Get(handle);
     }
 
-    SGL_INSTANTIATE_COMPONENT(Transform);
-    SGL_INSTANTIATE_COMPONENT(Color);
-    SGL_INSTANTIATE_COMPONENT(Visible);
+    template void Scene::AddComponent<Transform>(int handle, const Transform& value);
+    template void Scene::RemoveComponent<Transform>(int handle);
+    template bool Scene::HasComponent<Transform>(int handle) const;
+    template Transform& Scene::GetComponent<Transform>(int handle);
+    template const Transform& Scene::GetComponent<Transform>(int handle) const;
+
+    template void Scene::AddComponent<Color>(int handle, const Color& value);
+    template void Scene::RemoveComponent<Color>(int handle);
+    template bool Scene::HasComponent<Color>(int handle) const;
+    template Color& Scene::GetComponent<Color>(int handle);
+    template const Color& Scene::GetComponent<Color>(int handle) const;
+
+    template void Scene::AddComponent<Visible>(int handle, const Visible& value);
+    template void Scene::RemoveComponent<Visible>(int handle);
+    template bool Scene::HasComponent<Visible>(int handle) const;
+    template Visible& Scene::GetComponent<Visible>(int handle);
+    template const Visible& Scene::GetComponent<Visible>(int handle) const;
 
     bool Scene::IsValid(int handle) const
     {
@@ -235,6 +273,7 @@ namespace SGL
             prevSiblings.push_back(INVALID_HANDLE);
             alive.push_back(0);
             freeNext.push_back(INVALID_HANDLE);
+            worlds.push_back(Transform());
         }
 
         parents[handle] = INVALID_HANDLE;
@@ -242,6 +281,7 @@ namespace SGL
         nextSiblings[handle] = INVALID_HANDLE;
         prevSiblings[handle] = INVALID_HANDLE;
         freeNext[handle] = INVALID_HANDLE;
+        worlds[handle] = Transform();
         alive[handle] = 1;
 
         return handle;
@@ -271,6 +311,7 @@ namespace SGL
         firstChilds[handle] = INVALID_HANDLE;
         nextSiblings[handle] = INVALID_HANDLE;
         prevSiblings[handle] = INVALID_HANDLE;
+        worlds[handle] = Transform();
         alive[handle] = 0;
 
         freeNext[handle] = freeList;
@@ -282,20 +323,33 @@ namespace SGL
         if (!IsValid(child)) return;
         if (child == parent) return;
 
-        Transform world = IdentityTransform();
-        bool hasWorld = HasComponent<Transform>(child);
+        bool hasLocal = HasComponent<Transform>(child);
 
-        if (hasWorld)
-            world = GetComponent<Transform>(child);
+        Transform world = IdentityTransform();
+        if (hasLocal)
+            world = worlds[child];
 
         DetachChild(child);
 
         if (parent != INVALID_HANDLE && IsValid(parent))
             AttachChild(parent, child);
 
-        if (hasWorld)
+        if (hasLocal)
         {
-            GetComponent<Transform>(child) = world;
+            Transform parentWorld = IdentityTransform();
+            bool hasParentWorld = false;
+
+            if (parent != INVALID_HANDLE && HasComponent<Transform>(parent))
+            {
+                parentWorld = worlds[parent];
+                hasParentWorld = true;
+            }
+
+            if (hasParentWorld)
+                GetComponent<Transform>(child) = InverseComposeWorld(parentWorld, world);
+            else
+                GetComponent<Transform>(child) = world;
+
             UpdateWorld(child);
         }
     }
@@ -310,26 +364,25 @@ namespace SGL
     {
         bool hasLocal = HasComponent<Transform>(handle);
 
-        Transform currentWorld = parentWorld;
-
         if (hasLocal)
         {
             Transform& local = GetComponent<Transform>(handle);
 
             if (hasParentWorld)
-                currentWorld = ComposeWorld(parentWorld, local);
+                worlds[handle] = ComposeWorld(parentWorld, local);
             else
-                currentWorld = local;
-
-            local = currentWorld;
+                worlds[handle] = local;
         }
+
+        Transform currentWorld = hasLocal ? worlds[handle] : parentWorld;
+        bool currentValid = hasLocal ? true : hasParentWorld;
 
         int c = firstChilds[handle];
 
         while (c != INVALID_HANDLE)
         {
             int next = nextSiblings[c];
-            UpdateWorldRecursive(c, currentWorld, hasLocal ? true : hasParentWorld);
+            UpdateWorldRecursive(c, currentWorld, currentValid);
             c = next;
         }
     }
@@ -338,51 +391,21 @@ namespace SGL
     {
         if (!IsValid(handle)) return;
 
-        bool hasLocal = HasComponent<Transform>(handle);
+        Transform parentWorld = IdentityTransform();
+        bool hasParentWorld = false;
 
-        if (hasLocal)
+        if (parents[handle] != INVALID_HANDLE)
         {
-            Transform parentWorld = IdentityTransform();
-            bool hasParentWorld = false;
+            int p = parents[handle];
 
-            if (parents[handle] != INVALID_HANDLE)
+            if (HasComponent<Transform>(p))
             {
-                int p = parents[handle];
-
-                if (HasComponent<Transform>(p))
-                {
-                    parentWorld = GetComponent<Transform>(p);
-                    hasParentWorld = true;
-                }
-            }
-
-            UpdateWorldRecursive(handle, parentWorld, hasParentWorld);
-        }
-        else
-        {
-            Transform parentWorld = IdentityTransform();
-            bool hasParentWorld = false;
-
-            if (parents[handle] != INVALID_HANDLE)
-            {
-                int p = parents[handle];
-
-                if (HasComponent<Transform>(p))
-                {
-                    parentWorld = GetComponent<Transform>(p);
-                    hasParentWorld = true;
-                }
-            }
-
-            int c = firstChilds[handle];
-
-            while (c != INVALID_HANDLE)
-            {
-                int next = nextSiblings[c];
-                UpdateWorldRecursive(c, parentWorld, hasParentWorld);
-                c = next;
+                parentWorld = worlds[p];
+                hasParentWorld = true;
             }
         }
+
+        UpdateWorldRecursive(handle, parentWorld, hasParentWorld);
     }
 
     void Scene::SetEntityPosition(int handle, float x, float y, float z)
@@ -394,6 +417,17 @@ namespace SGL
     }
 
     void Scene::GetEntityPosition(int handle, float* x, float* y, float* z)
+    {
+        if (!IsValid(handle)) return;
+
+        raylib::Vector3 position = worlds[handle].position;
+
+        *x = position.x;
+        *y = position.y;
+        *z = position.z;
+    }
+
+    void Scene::GetEntityLocalPosition(int handle, float* x, float* y, float* z)
     {
         if (!HasComponent<Transform>(handle)) return;
 
@@ -417,6 +451,15 @@ namespace SGL
 
     void Scene::GetEntityRotation(int handle, float* pitch, float* yaw, float* roll)
     {
+        if (!IsValid(handle)) return;
+
+        raylib::Quaternion q = worlds[handle].rotation;
+
+        QuatToEuler(q.x, q.y, q.z, q.w, *pitch, *yaw, *roll);
+    }
+
+    void Scene::GetEntityLocalRotation(int handle, float* pitch, float* yaw, float* roll)
+    {
         if (!HasComponent<Transform>(handle)) return;
 
         raylib::Quaternion q = GetComponent<Transform>(handle).rotation;
@@ -433,6 +476,17 @@ namespace SGL
     }
 
     void Scene::GetEntityScale(int handle, float* sx, float* sy, float* sz)
+    {
+        if (!IsValid(handle)) return;
+
+        raylib::Vector3 scale = worlds[handle].scale;
+
+        *sx = scale.x;
+        *sy = scale.y;
+        *sz = scale.z;
+    }
+
+    void Scene::GetEntityLocalScale(int handle, float* sx, float* sy, float* sz)
     {
         if (!HasComponent<Transform>(handle)) return;
 
@@ -480,6 +534,11 @@ void GetEntityPosition(int handle, float* x, float* y, float* z)
     SGL::GetSceneInstance().GetEntityPosition(handle, x, y, z);
 }
 
+void GetEntityLocalPosition(int handle, float* x, float* y, float* z)
+{
+    SGL::GetSceneInstance().GetEntityLocalPosition(handle, x, y, z);
+}
+
 void SetEntityRotation(int handle, float pitch, float yaw, float roll)
 {
     SGL::GetSceneInstance().SetEntityRotation(handle, pitch, yaw, roll);
@@ -490,6 +549,11 @@ void GetEntityRotation(int handle, float* pitch, float* yaw, float* roll)
     SGL::GetSceneInstance().GetEntityRotation(handle, pitch, yaw, roll);
 }
 
+void GetEntityLocalRotation(int handle, float* pitch, float* yaw, float* roll)
+{
+    SGL::GetSceneInstance().GetEntityLocalRotation(handle, pitch, yaw, roll);
+}
+
 void SetEntityScale(int handle, float sx, float sy, float sz)
 {
     SGL::GetSceneInstance().SetEntityScale(handle, sx, sy, sz);
@@ -498,4 +562,9 @@ void SetEntityScale(int handle, float sx, float sy, float sz)
 void GetEntityScale(int handle, float* sx, float* sy, float* sz)
 {
     SGL::GetSceneInstance().GetEntityScale(handle, sx, sy, sz);
+}
+
+void GetEntityLocalScale(int handle, float* sx, float* sy, float* sz)
+{
+    SGL::GetSceneInstance().GetEntityLocalScale(handle, sx, sy, sz);
 }

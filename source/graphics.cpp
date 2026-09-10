@@ -1,6 +1,6 @@
 #include "SGL.h"
 #include "camera.h"
-#include "core.h"
+#include "raylibUtils.h"
 
 void Graphics3D(int width, int height, const char* title)
 {

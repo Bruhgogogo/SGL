@@ -6,8 +6,3 @@ namespace raylib
 #include <RaylibException.hpp>
 #include <raymath.hpp>
 }
-
-namespace SGL
-{   
-
-}

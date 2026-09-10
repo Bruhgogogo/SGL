@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core.h"
+#include "raylibUtils.h"
 #include "mathUtils.h"
 #include "component.h"
 
@@ -74,12 +74,15 @@ namespace SGL
 
         void SetEntityPosition(int handle, float x, float y, float z);
         void GetEntityPosition(int handle, float* x, float* y, float* z);
+        void GetEntityLocalPosition(int handle, float* x, float* y, float* z);
 
         void SetEntityRotation(int handle, float pitch, float yaw, float roll);
         void GetEntityRotation(int handle, float* pitch, float* yaw, float* roll);
+        void GetEntityLocalRotation(int handle, float* pitch, float* yaw, float* roll);
 
         void SetEntityScale(int handle, float sx, float sy, float sz);
         void GetEntityScale(int handle, float* sx, float* sy, float* sz);
+        void GetEntityLocalScale(int handle, float* sx, float* sy, float* sz);
 
     private:
         std::vector<int> parents;
@@ -90,6 +93,8 @@ namespace SGL
         std::vector<int> alive;
         std::vector<int> freeNext;
         int freeList = INVALID_HANDLE;
+
+        std::vector<Transform> worlds;
 
         std::vector<void*> pools;
         std::vector<void (*)(void*, int)> poolRemovers;
@@ -132,11 +137,14 @@ namespace SGL
 
     void SetEntityPosition(int handle, float x, float y, float z);
     void GetEntityPosition(int handle, float* x, float* y, float* z);
+    void GetEntityLocalPosition(int handle, float* x, float* y, float* z);
 
     void SetEntityRotation(int handle, float pitch, float yaw, float roll);
     void GetEntityRotation(int handle, float* pitch, float* yaw, float* roll);
+    void GetEntityLocalRotation(int handle, float* pitch, float* yaw, float* roll);
 
     void SetEntityScale(int handle, float sx, float sy, float sz);
     void GetEntityScale(int handle, float* sx, float* sy, float* sz);
+    void GetEntityLocalScale(int handle, float* sx, float* sy, float* sz);
 
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core.h"
+#include "raylibUtils.h"
 #include "mathUtils.h"
 
 namespace SGL
