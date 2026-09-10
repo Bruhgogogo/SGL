@@ -1,9 +1,21 @@
 #include "scene.h"
 
+// ====================================================================================================
+// NAMESPACE
+// ====================================================================================================
+
 namespace SGL
 {
 
+    // ====================================================================================================
+    // STATIC
+    // ====================================================================================================
+
     static Scene SceneInstance;
+
+    // ====================================================================================================
+    // APIs
+    // ====================================================================================================
 
     Scene& GetSceneInstance()
     {
@@ -192,11 +204,6 @@ namespace SGL
         return ((Scene*)this)->GetPool<T>().Get(handle);
     }
 
-    SGL_INSTANTIATE_COMPONENT(Transform);
-    SGL_INSTANTIATE_COMPONENT(Color);
-    SGL_INSTANTIATE_COMPONENT(Visible);
-    SGL_INSTANTIATE_COMPONENT(MeshID);
-        
     bool Scene::IsValid(int handle) const
     {
         if (handle == INVALID_HANDLE) return false;
@@ -506,4 +513,13 @@ namespace SGL
     {
         return renderList;
     }
+
+    // ====================================================================================================
+    // MACRO
+    // ====================================================================================================
+
+    SGL_INSTANTIATE_COMPONENT(Transform);
+    SGL_INSTANTIATE_COMPONENT(Color);
+    SGL_INSTANTIATE_COMPONENT(Visible);
+    SGL_INSTANTIATE_COMPONENT(MeshID);
 }
