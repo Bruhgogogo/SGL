@@ -218,3 +218,8 @@ SGL_API SGL_BOOL CheckCollision(int a, int b)
 {
     return SGL::PhysicalCheckCollision(a, b) ? 1 : 0;
 }
+
+SGL_API SGL_RayHit Raycast(SGL_Ray ray)
+{
+    return SGL::PhysicalRaycast(ray);
+}

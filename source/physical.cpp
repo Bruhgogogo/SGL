@@ -99,6 +99,86 @@ namespace SGL
         return true;
     }
 
+    static bool RayOBBIntersect(
+        SGL_Ray ray,
+        const OBB& obb,
+        float& tHit,
+        Vector3& normal)
+    {
+        Vector3 rayStart = { ray.startX, ray.startY, ray.startZ };
+        Vector3 rayEnd = { ray.endX, ray.endY, ray.endZ };
+
+        Quaternion invRot = QuaternionInvert(obb.worldRotation);
+
+        Vector3 localStart = Vector3Subtract(rayStart, obb.worldCenter);
+        localStart = Vector3RotateByQuaternion(localStart, invRot);
+
+        Vector3 localEnd = Vector3Subtract(rayEnd, obb.worldCenter);
+        localEnd = Vector3RotateByQuaternion(localEnd, invRot);
+
+        Vector3 dir = Vector3Subtract(localEnd, localStart);
+
+        float tmin = 0.0f;
+        float tmax = 1.0f;
+
+        int hitAxis = -1;
+        float hitSign = 1.0f;
+
+        for (int axis = 0; axis < 3; axis++)
+        {
+            float origin = axis == 0 ? localStart.x : (axis == 1 ? localStart.y : localStart.z);
+            float direction = axis == 0 ? dir.x : (axis == 1 ? dir.y : dir.z);
+            float half = axis == 0 ? obb.worldHalfExtents.x : (axis == 1 ? obb.worldHalfExtents.y : obb.worldHalfExtents.z);
+
+            if (fabsf(direction) < 1e-8f)
+            {
+                if (origin < -half || origin > half)
+                    return false;
+                continue;
+            }
+
+            float invDir = 1.0f / direction;
+            float t1 = (-half - origin) * invDir;
+            float t2 = (half - origin) * invDir;
+
+            float sign = -1.0f;
+
+            if (t1 > t2)
+            {
+                float tmp = t1;
+                t1 = t2;
+                t2 = tmp;
+                sign = 1.0f;
+            }
+
+            if (t1 > tmin)
+            {
+                tmin = t1;
+                hitAxis = axis;
+                hitSign = sign;
+            }
+
+            if (t2 < tmax)
+                tmax = t2;
+
+            if (tmin > tmax)
+                return false;
+        }
+
+        tHit = tmin;
+
+        if (hitAxis == 0)
+            normal = { hitSign, 0, 0 };
+        else if (hitAxis == 1)
+            normal = { 0, hitSign, 0 };
+        else
+            normal = { 0, 0, hitSign };
+
+        normal = Vector3RotateByQuaternion(normal, obb.worldRotation);
+
+        return true;
+    }
+
     // ====================================================================================================
     // APIs
     // ====================================================================================================
@@ -142,6 +222,55 @@ namespace SGL
         const OBB& boxB = scene.GetComponent<OBB>(b);
 
         return OBBIntersect(boxA, boxB) ? 1 : 0;
+    }
+
+    SGL_RayHit PhysicalRaycast(SGL_Ray ray)
+    {
+        Scene& scene = GetSceneInstance();
+
+        SGL_RayHit result = {};
+        result.entity = -1;
+
+        float closest = 1e30f;
+
+        Vector3 rayStart = { ray.startX, ray.startY, ray.startZ };
+        Vector3 rayEnd = { ray.endX, ray.endY, ray.endZ };
+        Vector3 rayDelta = Vector3Subtract(rayEnd, rayStart);
+
+        for (int i = 0; i < (int)scene.GetEntityCount(); i++)
+        {
+            if (!scene.IsAlive(i)) continue;
+            if (!scene.HasComponent<OBB>(i)) continue;
+            if (!scene.HasComponent<Physical>(i)) continue;
+            if (scene.GetComponent<Physical>(i).canCollide == 0) continue;
+
+            const OBB& obb = scene.GetComponent<OBB>(i);
+
+            float tHit = 0.0f;
+            Vector3 normal = { 0, 0, 0 };
+
+            if (!RayOBBIntersect(ray, obb, tHit, normal))
+                continue;
+
+            if (tHit >= closest)
+                continue;
+
+            closest = tHit;
+
+            Vector3 point = Vector3Add(rayStart, Vector3Scale(rayDelta, tHit));
+
+            result.hit = 1;
+            result.entity = i;
+            result.pointX = point.x;
+            result.pointY = point.y;
+            result.pointZ = point.z;
+            result.normalX = normal.x;
+            result.normalY = normal.y;
+            result.normalZ = normal.z;
+            result.distance = Vector3Distance(rayStart, point);
+        }
+
+        return result;
     }
 
 }

@@ -1,12 +1,5 @@
 #pragma once
 
-typedef enum
-{
-    SGL_WINDOWED,
-    SGL_BORDERLESS,
-    SGL_FULLSCREEN
-} SGL_WindowMode;
-
 // #define SGL_EXPORT
 #define SGL_STATIC
 
@@ -21,6 +14,36 @@ typedef enum
 #endif
 
 typedef int SGL_BOOL;
+
+typedef enum
+{
+    SGL_WINDOWED,
+    SGL_BORDERLESS,
+    SGL_FULLSCREEN
+} SGL_WindowMode;
+
+typedef struct
+{
+    float startX;
+    float startY;
+    float startZ;
+    float endX;
+    float endY;
+    float endZ;
+} SGL_Ray;
+
+typedef struct
+{
+    SGL_BOOL hit;
+    int      entity;
+    float    pointX;
+    float    pointY;
+    float    pointZ;
+    float    normalX;
+    float    normalY;
+    float    normalZ;
+    float    distance;
+} SGL_RayHit;
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,6 +104,8 @@ extern "C" {
     SGL_API SGL_BOOL  GetEntityCollide(int handle);
 
     SGL_API SGL_BOOL  CheckCollision(int a, int b);
+
+    SGL_API SGL_RayHit Raycast(SGL_Ray ray);
 
 #ifdef __cplusplus
 }

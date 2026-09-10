@@ -108,6 +108,8 @@ namespace SGL
 
         void SetEntityMeshID(int handle, int meshID);
 
+        int GetEntityCount() const;
+
     private:
         std::vector<int> parents;
         std::vector<int> firstChilds;
