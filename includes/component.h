@@ -24,6 +24,19 @@ namespace SGL
         int value = 1;
     };
 
+    struct Physical
+    {
+        float mass = 1.0f;
+        int canCollide = 1;
+    };
+
+    struct OBB
+    {
+        Vector3 center = { 0, 0, 0 };
+        Vector3 halfExtents = { 0, 0, 0 };
+        Quaternion rotation = QuaternionIdentity();
+    };
+
     struct MeshID
     {
         int value = 0;

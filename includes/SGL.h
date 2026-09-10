@@ -1,5 +1,12 @@
 #pragma once
 
+typedef enum
+{
+    SGL_WINDOWED,
+    SGL_BORDERLESS,
+    SGL_FULLSCREEN
+} SGL_WindowMode;
+
 // #define SGL_EXPORT
 #define SGL_STATIC
 
@@ -21,7 +28,14 @@ extern "C" {
 
     SGL_API void Graphics3D(int width, int height, const char* title);
     SGL_API SGL_BOOL IsWindowShouldClose();
-    SGL_API void RenderWorld();
+
+    SGL_API void GetWindowWidth(int* width);
+    SGL_API void GetWindowHeight(int* height);
+    SGL_API void GetWindowMode(SGL_WindowMode* mode);
+
+    SGL_API void SetWindowWidth(int width);
+    SGL_API void SetWindowHeight(int height);
+    SGL_API void SetWindowMode(SGL_WindowMode mode);
 
     SGL_API void SetCameraPosition(float x, float y, float z);
     SGL_API void GetCameraPosition(float* x, float* y, float* z);
@@ -36,7 +50,8 @@ extern "C" {
     SGL_API void SetParent(int child, int parent);
     SGL_API int  GetParent(int handle);
 
-    SGL_API void UpdateWorld(int handle);
+    SGL_API void UpdateWorld();
+    SGL_API void RenderWorld();
 
     SGL_API void SetEntityPosition(int handle, float x, float y, float z);
     SGL_API void GetEntityPosition(int handle, float* x, float* y, float* z);
@@ -56,7 +71,16 @@ extern "C" {
     SGL_API void GetEntityColor(int handle, unsigned char* r, unsigned char* g, unsigned char* b, unsigned char* a);
 
     SGL_API void SetEntityVisible(int handle, int visible);
-    SGL_API int  GetEntityVisible(int handle);
+    SGL_API SGL_BOOL  GetEntityVisible(int handle);
+
+    SGL_API void SetEntityMeshID(int handle, int meshID);
+
+    SGL_API SGL_BOOL IsEntityValid(int handle);
+
+    SGL_API void SetEntityCollide(int handle, int canCollide);
+    SGL_API SGL_BOOL  GetEntityCollide(int handle);
+
+    SGL_API SGL_BOOL  CheckCollision(int a, int b);
 
 #ifdef __cplusplus
 }

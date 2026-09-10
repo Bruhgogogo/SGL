@@ -89,7 +89,7 @@ namespace SGL
         template <typename T>
         const T& GetComponent(int handle) const;
 
-        void UpdateWorld(int handle);
+        void UpdateEntityTree(int handle);
 
         void CollectRenderList();
         const std::vector<RenderItem>& GetRenderList() const;
@@ -105,6 +105,9 @@ namespace SGL
         void SetEntityScale(int handle, float sx, float sy, float sz);
         void GetEntityScale(int handle, float* sx, float* sy, float* sz);
         void GetEntityLocalScale(int handle, float* sx, float* sy, float* sz);
+
+        void SetEntityMeshID(int handle, int meshID);
+        int  CheckCollision(int a, int b);
 
     private:
         std::vector<int> parents;
@@ -131,6 +134,8 @@ namespace SGL
         void DetachChild(int child);
 
         void UpdateWorldRecursive(int handle, const Transform& parentWorld, bool hasParentWorld);
+
+        OBB ComputeOBB(const Transform& world, int meshID);
     };
 
     // ====================================================================================================
@@ -140,6 +145,8 @@ namespace SGL
     SGL_DECLARE_COMPONENT(Transform);
     SGL_DECLARE_COMPONENT(Color);
     SGL_DECLARE_COMPONENT(Visible);
+    SGL_DECLARE_COMPONENT(Physical);
+    SGL_DECLARE_COMPONENT(OBB);
     SGL_DECLARE_COMPONENT(MeshID);
 
     // ====================================================================================================

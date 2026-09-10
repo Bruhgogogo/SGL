@@ -6,6 +6,8 @@
 #include "cube.h"
 #include "raylibUtils.h"
 
+#include <iostream>
+
 SGL_API void Graphics3D(int width, int height, const char* title)
 {
     SGL::GraphicsInit(width, height, title);
@@ -16,9 +18,19 @@ SGL_API SGL_BOOL IsWindowShouldClose()
     return SGL::GraphicsShouldClose() ? 1 : 0;
 }
 
-SGL_API void RenderWorld()
+SGL_API void GetWindowWidth(int* width)
 {
-    SGL::GraphicsRender();
+    SGL::GraphicsGetWindowWidth(width);
+}
+
+SGL_API void GetWindowHeight(int* height)
+{
+    SGL::GraphicsGetWindowHeight(height);
+}
+
+SGL_API void SetWindowMode(SGL_WindowMode mode)
+{
+    SGL::GraphicsSetWindowMode((int)mode);
 }
 
 SGL_API void SetCameraPosition(float x, float y, float z)
@@ -81,7 +93,12 @@ SGL_API int GetParent(int handle)
 
 SGL_API void UpdateWorld(int handle)
 {
-    SGL::GetSceneInstance().UpdateWorld(handle);
+
+}
+
+SGL_API void RenderWorld()
+{
+    SGL::GraphicsRender();
 }
 
 SGL_API void SetEntityPosition(int handle, float x, float y, float z)
@@ -165,9 +182,38 @@ SGL_API void SetEntityVisible(int handle, int visible)
     SGL::GetSceneInstance().GetComponent<SGL::Visible>(handle).value = visible;
 }
 
-SGL_API int GetEntityVisible(int handle)
+SGL_API SGL_BOOL GetEntityVisible(int handle)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Visible>(handle)) return 0;
 
     return SGL::GetSceneInstance().GetComponent<SGL::Visible>(handle).value;
+}
+
+SGL_API void SetEntityMeshID(int handle, int meshID)
+{
+    SGL::GetSceneInstance().SetEntityMeshID(handle, meshID);
+}
+
+SGL_API SGL_BOOL IsEntityValid(int handle)
+{
+    return SGL::GetSceneInstance().IsAlive(handle) ? 1 : 0;
+}
+
+SGL_API void SetEntityCollide(int handle, int canCollide)
+{
+    if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return;
+
+    SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).canCollide = canCollide;
+}
+
+SGL_API SGL_BOOL GetEntityCollide(int handle)
+{
+    if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return 0;
+
+    return SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).canCollide;
+}
+
+SGL_API SGL_BOOL CheckCollision(int a, int b)
+{
+    return SGL::GetSceneInstance().CheckCollision(a, b);
 }

@@ -54,6 +54,46 @@ namespace SGL
         return WindowShouldClose();
     }
 
+    void GraphicsGetWindowWidth(int* width)
+    {
+        *width = GetScreenWidth();
+    }
+
+    void GraphicsGetWindowHeight(int* height)
+    {
+        *height = GetScreenHeight();
+    }
+
+    void GraphicsSetWindowMode(int mode)
+    {
+        ::ClearWindowState(FLAG_FULLSCREEN_MODE | FLAG_BORDERLESS_WINDOWED_MODE);
+
+        if (mode == 1)
+            ::SetWindowState(FLAG_BORDERLESS_WINDOWED_MODE);
+        else if (mode == 2)
+            ::SetWindowState(FLAG_FULLSCREEN_MODE);
+    }
+
+    void GraphicsSetWindowWidth(int width)
+    {
+        ::SetWindowSize(width, GetScreenHeight());
+    }
+
+    void GraphicsSetWindowHeight(int height)
+    {
+        ::SetWindowSize(GetScreenWidth(), height);
+    }
+
+    void GraphicsGetWindowMode(int* mode)
+    {
+        if (::IsWindowState(FLAG_FULLSCREEN_MODE))
+            *mode = 2;
+        else if (::IsWindowState(FLAG_BORDERLESS_WINDOWED_MODE))
+            *mode = 1;
+        else
+            *mode = 0;
+    }
+
     void GraphicsRender()
     {
         EnsureCubeModel();
