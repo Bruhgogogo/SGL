@@ -9,6 +9,9 @@ namespace SGL
         Vector3    position = { 0, 0, 0 };
         Quaternion rotation = QuaternionIdentity();
         Vector3    scale = { 1, 1, 1 };
+
+        mutable Matrix cachedMatrix = MatrixIdentity();
+        mutable int    matrixDirty = 1;
     };
 
     struct Color
@@ -32,9 +35,13 @@ namespace SGL
 
     struct OBB
     {
-        Vector3 center = { 0, 0, 0 };
-        Vector3 halfExtents = { 0, 0, 0 };
-        Quaternion rotation = QuaternionIdentity();
+        Vector3    localCenter = { 0, 0, 0 };
+        Vector3    localHalfExtents = { 0, 0, 0 };
+        Quaternion localRotation = QuaternionIdentity();
+
+        Vector3    worldCenter = { 0, 0, 0 };
+        Vector3    worldHalfExtents = { 0, 0, 0 };
+        Quaternion worldRotation = QuaternionIdentity();
     };
 
     struct MeshID

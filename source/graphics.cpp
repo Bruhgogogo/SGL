@@ -30,12 +30,18 @@ namespace SGL
 
     static Matrix MakeTransformMatrix(const Transform& t)
     {
+        if (t.matrixDirty == 0)
+            return t.cachedMatrix;
+
         Matrix matScale = MatrixScale(t.scale.x, t.scale.y, t.scale.z);
         Matrix matRot = QuaternionToMatrix(t.rotation);
         Matrix matTrans = MatrixTranslate(t.position.x, t.position.y, t.position.z);
 
         Matrix mat = MatrixMultiply(matScale, matRot);
         mat = MatrixMultiply(mat, matTrans);
+
+        t.cachedMatrix = mat;
+        t.matrixDirty = 0;
 
         return mat;
     }

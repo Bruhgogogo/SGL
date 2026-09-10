@@ -9,10 +9,12 @@ int main()
 
     int cube1 = CreateCube();
     SetEntityPosition(cube1, 0, 0, -5);
+    SetEntityColor(cube1, 0, 0, 255, 255);
 
     int cube2 = CreateCube();
     SetEntityPosition(cube2, 0, 0, -5);
     SetEntityScale(cube2, 2, 1, 1);
+    SetEntityColor(cube2, 255, 0, 0, 255);
 
     SetCameraPosition(0, 0, 0);
 

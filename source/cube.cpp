@@ -1,7 +1,15 @@
 #include "cube.h"
 
+// ====================================================================================================
+// NAMESPACE
+// ====================================================================================================
+
 namespace SGL
 {
+
+    // ====================================================================================================
+    // APIs
+    // ====================================================================================================
 
     int CreateCube()
     {
@@ -16,9 +24,9 @@ namespace SGL
         scene.AddComponent<MeshID>(handle, MeshID());
 
         OBB box;
-        box.center = { 0, 0, 0 };
-        box.halfExtents = { 0.5f, 0.5f, 0.5f };
-        box.rotation = QuaternionIdentity();
+        box.localCenter = { 0, 0, 0 };
+        box.localHalfExtents = { 0.5f, 0.5f, 0.5f };
+        box.localRotation = QuaternionIdentity();
 
         scene.AddComponent<OBB>(handle, box);
 

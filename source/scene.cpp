@@ -364,10 +364,12 @@ namespace SGL
             else
                 worlds[handle] = local;
 
+            worlds[handle].matrixDirty = 1;
+
             if (HasComponent<OBB>(handle))
             {
-                int meshID = HasComponent<MeshID>(handle) ? GetComponent<MeshID>(handle).value : -1;
-                GetComponent<OBB>(handle) = PhysicalComputeOBB(worlds[handle], meshID);
+                OBB& obb = GetComponent<OBB>(handle);
+                PhysicalComputeOBB(worlds[handle], obb);
             }
         }
 
@@ -526,11 +528,6 @@ namespace SGL
         if (!HasComponent<MeshID>(handle)) return;
 
         GetComponent<MeshID>(handle).value = meshID;
-
-        if (HasComponent<OBB>(handle))
-        {
-            GetComponent<OBB>(handle) = PhysicalComputeOBB(worlds[handle], meshID);
-        }
     }
 
     // ====================================================================================================

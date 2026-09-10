@@ -13,7 +13,7 @@ namespace SGL
     // APIs
     // ====================================================================================================
 
-    OBB  PhysicalComputeOBB(const Transform& world, int meshID);
+    void PhysicalComputeOBB(const Transform& world, OBB& obb);
     int  PhysicalCheckCollision(int a, int b);
 
 }
