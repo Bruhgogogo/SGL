@@ -5,6 +5,7 @@
 #include "graphics.h"
 #include "cube.h"
 #include "raylibUtils.h"
+#include "physical.h"
 
 #include <iostream>
 
@@ -215,5 +216,5 @@ SGL_API SGL_BOOL GetEntityCollide(int handle)
 
 SGL_API SGL_BOOL CheckCollision(int a, int b)
 {
-    return SGL::GetSceneInstance().CheckCollision(a, b);
+    return SGL::PhysicalCheckCollision(a, b) ? 1 : 0;
 }

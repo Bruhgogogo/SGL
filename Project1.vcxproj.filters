@@ -51,6 +51,9 @@
     <ClCompile Include="source\SGL.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\physical.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\SGL.h">
@@ -76,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="includes\graphics.h">
       <Filter>头文件\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\physical.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

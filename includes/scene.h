@@ -107,7 +107,6 @@ namespace SGL
         void GetEntityLocalScale(int handle, float* sx, float* sy, float* sz);
 
         void SetEntityMeshID(int handle, int meshID);
-        int  CheckCollision(int a, int b);
 
     private:
         std::vector<int> parents;
@@ -134,8 +133,6 @@ namespace SGL
         void DetachChild(int child);
 
         void UpdateWorldRecursive(int handle, const Transform& parentWorld, bool hasParentWorld);
-
-        OBB ComputeOBB(const Transform& world, int meshID);
     };
 
     // ====================================================================================================
