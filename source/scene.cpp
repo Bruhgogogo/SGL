@@ -128,10 +128,6 @@ namespace SGL
         return data[sparse[entity]];
     }
 
-    template class ComponentPool<Transform>;
-    template class ComponentPool<Color>;
-    template class ComponentPool<Visible>;
-
     template <typename T>
     int& PoolIndex()
     {
@@ -196,24 +192,11 @@ namespace SGL
         return ((Scene*)this)->GetPool<T>().Get(handle);
     }
 
-    template void Scene::AddComponent<Transform>(int handle, const Transform& value);
-    template void Scene::RemoveComponent<Transform>(int handle);
-    template bool Scene::HasComponent<Transform>(int handle) const;
-    template Transform& Scene::GetComponent<Transform>(int handle);
-    template const Transform& Scene::GetComponent<Transform>(int handle) const;
-
-    template void Scene::AddComponent<Color>(int handle, const Color& value);
-    template void Scene::RemoveComponent<Color>(int handle);
-    template bool Scene::HasComponent<Color>(int handle) const;
-    template Color& Scene::GetComponent<Color>(int handle);
-    template const Color& Scene::GetComponent<Color>(int handle) const;
-
-    template void Scene::AddComponent<Visible>(int handle, const Visible& value);
-    template void Scene::RemoveComponent<Visible>(int handle);
-    template bool Scene::HasComponent<Visible>(int handle) const;
-    template Visible& Scene::GetComponent<Visible>(int handle);
-    template const Visible& Scene::GetComponent<Visible>(int handle) const;
-
+    SGL_INSTANTIATE_COMPONENT(Transform);
+    SGL_INSTANTIATE_COMPONENT(Color);
+    SGL_INSTANTIATE_COMPONENT(Visible);
+    SGL_INSTANTIATE_COMPONENT(MeshID);
+        
     bool Scene::IsValid(int handle) const
     {
         if (handle == INVALID_HANDLE) return false;
@@ -497,74 +480,30 @@ namespace SGL
         *sz = scale.z;
     }
 
-}
+    void Scene::CollectRenderList()
+    {
+        renderList.clear();
 
-int CreateEntity()
-{
-    return SGL::GetSceneInstance().CreateEntity();
-}
+        for (int i = 0; i < (int)alive.size(); i++)
+        {
+            if (!alive[i]) continue;
+            if (!HasComponent<Transform>(i)) continue;
+            if (!HasComponent<Color>(i)) continue;
+            if (!HasComponent<MeshID>(i)) continue;
+            if (!HasComponent<Visible>(i)) continue;
+            if (GetComponent<Visible>(i).value == 0) continue;
 
-void DestroyEntity(int handle)
-{
-    SGL::GetSceneInstance().DestroyEntity(handle);
-}
+            RenderItem item;
+            item.transform = worlds[i];
+            item.color = GetComponent<Color>(i);
+            item.meshID = GetComponent<MeshID>(i).value;
 
-void SetParent(int child, int parent)
-{
-    SGL::GetSceneInstance().SetParent(child, parent);
-}
+            renderList.push_back(item);
+        }
+    }
 
-int GetParent(int handle)
-{
-    return SGL::GetSceneInstance().GetParent(handle);
-}
-
-void UpdateWorld(int handle)
-{
-    SGL::GetSceneInstance().UpdateWorld(handle);
-}
-
-void SetEntityPosition(int handle, float x, float y, float z)
-{
-    SGL::GetSceneInstance().SetEntityPosition(handle, x, y, z);
-}
-
-void GetEntityPosition(int handle, float* x, float* y, float* z)
-{
-    SGL::GetSceneInstance().GetEntityPosition(handle, x, y, z);
-}
-
-void GetEntityLocalPosition(int handle, float* x, float* y, float* z)
-{
-    SGL::GetSceneInstance().GetEntityLocalPosition(handle, x, y, z);
-}
-
-void SetEntityRotation(int handle, float pitch, float yaw, float roll)
-{
-    SGL::GetSceneInstance().SetEntityRotation(handle, pitch, yaw, roll);
-}
-
-void GetEntityRotation(int handle, float* pitch, float* yaw, float* roll)
-{
-    SGL::GetSceneInstance().GetEntityRotation(handle, pitch, yaw, roll);
-}
-
-void GetEntityLocalRotation(int handle, float* pitch, float* yaw, float* roll)
-{
-    SGL::GetSceneInstance().GetEntityLocalRotation(handle, pitch, yaw, roll);
-}
-
-void SetEntityScale(int handle, float sx, float sy, float sz)
-{
-    SGL::GetSceneInstance().SetEntityScale(handle, sx, sy, sz);
-}
-
-void GetEntityScale(int handle, float* sx, float* sy, float* sz)
-{
-    SGL::GetSceneInstance().GetEntityScale(handle, sx, sy, sz);
-}
-
-void GetEntityLocalScale(int handle, float* sx, float* sy, float* sz)
-{
-    SGL::GetSceneInstance().GetEntityLocalScale(handle, sx, sy, sz);
+    const std::vector<RenderItem>& Scene::GetRenderList() const
+    {
+        return renderList;
+    }
 }

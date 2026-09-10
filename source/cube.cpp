@@ -10,6 +10,7 @@ namespace SGL
         AddComponent<Transform>(handle, Transform());
         AddComponent<Color>(handle, Color());
         AddComponent<Visible>(handle, Visible());
+        AddComponent<MeshID>(handle, MeshID());
 
         return handle;
     }

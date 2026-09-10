@@ -1,29 +1,33 @@
-#include "SGL.h"
+#include "graphics.h"
 #include "camera.h"
-#include "raylibUtils.h"
 
-void Graphics3D(int width, int height, const char* title)
+namespace SGL
 {
-    raylib::InitWindow(width, height, title);
-}
 
-SGL_BOOL IsWindowShouldClose()
-{
-    return raylib::WindowShouldClose() ? 1 : 0;
-}
+    void GraphicsInit(int width, int height, const char* title)
+    {
+        raylib::InitWindow(width, height, title);
+    }
 
-void RenderWorld()
-{
-    SGL::InternalCamera& camera = SGL::GetCameraInstance();
-    camera.UpdateCamera();
+    bool GraphicsShouldClose()
+    {
+        return raylib::WindowShouldClose();
+    }
 
-    raylib::BeginDrawing();
+    void GraphicsRender()
+    {
+        InternalCamera& camera = GetCameraInstance();
+        camera.UpdateCamera();
 
-    raylib::ClearBackground({ 0, 0, 0, 255 });
+        raylib::BeginDrawing();
 
-    raylib::BeginMode3D(camera.raylibCamera);
+        raylib::ClearBackground({ 0, 0, 0, 255 });
 
-    raylib::EndMode3D();
+        raylib::BeginMode3D(camera.raylibCamera);
 
-    raylib::EndDrawing();
+        raylib::EndMode3D();
+
+        raylib::EndDrawing();
+    }
+
 }

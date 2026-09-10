@@ -72,6 +72,9 @@ namespace SGL
 
         void UpdateWorld(int handle);
 
+        void CollectRenderList();
+        const std::vector<RenderItem>& GetRenderList() const;
+
         void SetEntityPosition(int handle, float x, float y, float z);
         void GetEntityPosition(int handle, float* x, float* y, float* z);
         void GetEntityLocalPosition(int handle, float* x, float* y, float* z);
@@ -99,6 +102,8 @@ namespace SGL
         std::vector<void*> pools;
         std::vector<void (*)(void*, int)> poolRemovers;
 
+        std::vector<RenderItem> renderList;
+
         template <typename T>
         ComponentPool<T>& GetPool();
 
@@ -112,14 +117,9 @@ namespace SGL
     SGL_DECLARE_COMPONENT(Transform);
     SGL_DECLARE_COMPONENT(Color);
     SGL_DECLARE_COMPONENT(Visible);
+    SGL_DECLARE_COMPONENT(MeshID);
 
     Scene& GetSceneInstance();
-
-    int  CreateEntity();
-    void DestroyEntity(int handle);
-
-    void SetParent(int child, int parent);
-    int  GetParent(int handle);
 
     template <typename T>
     void AddComponent(int handle, const T& value);
@@ -132,19 +132,5 @@ namespace SGL
 
     template <typename T>
     T& GetComponent(int handle);
-
-    void UpdateWorld(int handle);
-
-    void SetEntityPosition(int handle, float x, float y, float z);
-    void GetEntityPosition(int handle, float* x, float* y, float* z);
-    void GetEntityLocalPosition(int handle, float* x, float* y, float* z);
-
-    void SetEntityRotation(int handle, float pitch, float yaw, float roll);
-    void GetEntityRotation(int handle, float* pitch, float* yaw, float* roll);
-    void GetEntityLocalRotation(int handle, float* pitch, float* yaw, float* roll);
-
-    void SetEntityScale(int handle, float sx, float sy, float sz);
-    void GetEntityScale(int handle, float* sx, float* sy, float* sz);
-    void GetEntityLocalScale(int handle, float* sx, float* sy, float* sz);
 
 }

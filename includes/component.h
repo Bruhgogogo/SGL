@@ -24,4 +24,15 @@ namespace SGL
         int value = 1;
     };
 
+    struct MeshID
+    {
+        int value = 0;
+    };
+
+    struct RenderItem
+    {
+        Transform transform;
+        Color     color;
+        int       meshID;
+    };
 }
