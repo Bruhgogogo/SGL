@@ -121,16 +121,4 @@ namespace SGL
 
     Scene& GetSceneInstance();
 
-    template <typename T>
-    void AddComponent(int handle, const T& value);
-
-    template <typename T>
-    void RemoveComponent(int handle);
-
-    template <typename T>
-    bool HasComponent(int handle);
-
-    template <typename T>
-    T& GetComponent(int handle);
-
 }

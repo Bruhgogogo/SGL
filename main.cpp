@@ -1,11 +1,18 @@
-#include "blitz3d.h"
+#include "SGL.h"
 
 int main()
 {
-	Graphics3D(1270, 800, "Hello Raylib!");
+    Graphics3D(1270, 800, "Hello Raylib!");
 
-	while (!IsWindowShouldClose())
-	{
-		RenderWorld();
-	}
+    int cube = CreateCube();
+    SetEntityPosition(cube, 0, 0, -5);
+
+    SetCameraPosition(0, 0, 0);
+
+    while (!IsWindowShouldClose())
+    {
+        RenderWorld();
+    }
+
+    return 0;
 }

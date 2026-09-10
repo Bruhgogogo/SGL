@@ -13,27 +13,42 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\Utils">
+      <UniqueIdentifier>{bf93339c-b752-47cd-b058-03021abd54e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Modules">
+      <UniqueIdentifier>{4bd2eb51-5099-4b90-aa59-e704056c953d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Modules">
+      <UniqueIdentifier>{1f1c39c4-fb4f-41d5-989e-c91954bfbf36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Entites">
+      <UniqueIdentifier>{eedd934c-b077-4cdd-92fc-369489449a51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Entites">
+      <UniqueIdentifier>{8075f476-ed81-4a57-a8ce-838f7e97635e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\core.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\camera.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="source\graphics.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\Modules</Filter>
     </ClCompile>
     <ClCompile Include="source\scene.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="source\camera.cpp">
+      <Filter>源文件\Entites</Filter>
     </ClCompile>
     <ClCompile Include="source\cube.cpp">
+      <Filter>源文件\Entites</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SGL.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,23 +56,26 @@
     <ClInclude Include="includes\SGL.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="includes\core.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="includes\camera.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="includes\mathUtils.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="includes\scene.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="includes\component.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="includes\raylibUtils.h">
+      <Filter>头文件\Utils</Filter>
     </ClInclude>
     <ClInclude Include="includes\cube.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\Entites</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\camera.h">
+      <Filter>头文件\Entites</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\scene.h">
+      <Filter>头文件\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\component.h">
+      <Filter>头文件\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\graphics.h">
+      <Filter>头文件\Modules</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

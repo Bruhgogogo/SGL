@@ -5,12 +5,14 @@ namespace SGL
 
     int CreateCube()
     {
-        int handle = CreateEntity();
+        Scene& scene = GetSceneInstance();
 
-        AddComponent<Transform>(handle, Transform());
-        AddComponent<Color>(handle, Color());
-        AddComponent<Visible>(handle, Visible());
-        AddComponent<MeshID>(handle, MeshID());
+        int handle = scene.CreateEntity();
+
+        scene.AddComponent<Transform>(handle, Transform());
+        scene.AddComponent<Color>(handle, Color());
+        scene.AddComponent<Visible>(handle, Visible());
+        scene.AddComponent<MeshID>(handle, MeshID());
 
         return handle;
     }

@@ -20,16 +20,16 @@ namespace SGL
     {
         Transform world;
 
-        raylib::Vector3 scaled = {
+        Vector3 scaled = {
             parentWorld.scale.x * local.position.x,
             parentWorld.scale.y * local.position.y,
             parentWorld.scale.z * local.position.z
         };
 
-        raylib::Vector3 rotated = raylib::Vector3RotateByQuaternion(scaled, parentWorld.rotation);
+        Vector3 rotated = Vector3RotateByQuaternion(scaled, parentWorld.rotation);
 
-        world.position = raylib::Vector3Add(parentWorld.position, rotated);
-        world.rotation = raylib::QuaternionMultiply(parentWorld.rotation, local.rotation);
+        world.position = Vector3Add(parentWorld.position, rotated);
+        world.rotation = QuaternionMultiply(parentWorld.rotation, local.rotation);
         world.scale = {
             parentWorld.scale.x * local.scale.x,
             parentWorld.scale.y * local.scale.y,
@@ -43,10 +43,10 @@ namespace SGL
     {
         Transform local;
 
-        raylib::Quaternion invRot = raylib::QuaternionInvert(parentWorld.rotation);
+        Quaternion invRot = QuaternionInvert(parentWorld.rotation);
 
-        raylib::Vector3 delta = raylib::Vector3Subtract(world.position, parentWorld.position);
-        raylib::Vector3 rotated = raylib::Vector3RotateByQuaternion(delta, invRot);
+        Vector3 delta = Vector3Subtract(world.position, parentWorld.position);
+        Vector3 rotated = Vector3RotateByQuaternion(delta, invRot);
 
         local.position = {
             rotated.x / parentWorld.scale.x,
@@ -54,7 +54,7 @@ namespace SGL
             rotated.z / parentWorld.scale.z
         };
 
-        local.rotation = raylib::QuaternionMultiply(invRot, world.rotation);
+        local.rotation = QuaternionMultiply(invRot, world.rotation);
 
         local.scale = {
             world.scale.x / parentWorld.scale.x,
@@ -403,7 +403,7 @@ namespace SGL
     {
         if (!IsValid(handle)) return;
 
-        raylib::Vector3 position = worlds[handle].position;
+        Vector3 position = worlds[handle].position;
 
         *x = position.x;
         *y = position.y;
@@ -414,7 +414,7 @@ namespace SGL
     {
         if (!HasComponent<Transform>(handle)) return;
 
-        raylib::Vector3 position = GetComponent<Transform>(handle).position;
+        Vector3 position = GetComponent<Transform>(handle).position;
 
         *x = position.x;
         *y = position.y;
@@ -436,7 +436,7 @@ namespace SGL
     {
         if (!IsValid(handle)) return;
 
-        raylib::Quaternion q = worlds[handle].rotation;
+        Quaternion q = worlds[handle].rotation;
 
         QuatToEuler(q.x, q.y, q.z, q.w, *pitch, *yaw, *roll);
     }
@@ -445,7 +445,7 @@ namespace SGL
     {
         if (!HasComponent<Transform>(handle)) return;
 
-        raylib::Quaternion q = GetComponent<Transform>(handle).rotation;
+        Quaternion q = GetComponent<Transform>(handle).rotation;
 
         QuatToEuler(q.x, q.y, q.z, q.w, *pitch, *yaw, *roll);
     }
@@ -462,7 +462,7 @@ namespace SGL
     {
         if (!IsValid(handle)) return;
 
-        raylib::Vector3 scale = worlds[handle].scale;
+        Vector3 scale = worlds[handle].scale;
 
         *sx = scale.x;
         *sy = scale.y;
@@ -473,7 +473,7 @@ namespace SGL
     {
         if (!HasComponent<Transform>(handle)) return;
 
-        raylib::Vector3 scale = GetComponent<Transform>(handle).scale;
+        Vector3 scale = GetComponent<Transform>(handle).scale;
 
         *sx = scale.x;
         *sy = scale.y;

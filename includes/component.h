@@ -6,9 +6,9 @@ namespace SGL
 {
     struct Transform
     {
-        raylib::Vector3    position = { 0, 0, 0 };
-        raylib::Quaternion rotation = raylib::QuaternionIdentity();
-        raylib::Vector3    scale = { 1, 1, 1 };
+        Vector3    position = { 0, 0, 0 };
+        Quaternion rotation = QuaternionIdentity();
+        Vector3    scale = { 1, 1, 1 };
     };
 
     struct Color

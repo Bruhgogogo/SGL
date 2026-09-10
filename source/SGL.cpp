@@ -28,7 +28,7 @@ SGL_API void SetCameraPosition(float x, float y, float z)
 
 SGL_API void GetCameraPosition(float* x, float* y, float* z)
 {
-    raylib::Vector3 position = SGL::GetCameraInstance().GetPosition();
+    Vector3 position = SGL::GetCameraInstance().GetPosition();
 
     *x = position.x;
     *y = position.y;
@@ -37,12 +37,12 @@ SGL_API void GetCameraPosition(float* x, float* y, float* z)
 
 SGL_API void SetCameraRotation(float pitch, float yaw, float roll)
 {
-    SGL::GetCameraInstance().SetRotationEuler(raylib::Vector3(pitch, yaw, roll));
+    SGL::GetCameraInstance().SetRotationEuler(Vector3(pitch, yaw, roll));
 }
 
 SGL_API void GetCameraRotation(float* pitch, float* yaw, float* roll)
 {
-    raylib::Vector3 rotation = SGL::GetCameraInstance().GetRotationEuler();
+    Vector3 rotation = SGL::GetCameraInstance().GetRotationEuler();
 
     *pitch = rotation.x;
     *yaw = rotation.y;

@@ -145,19 +145,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\camera.cpp" />
-    <ClCompile Include="source\core.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="source\cube.cpp" />
     <ClCompile Include="source\graphics.cpp" />
     <ClCompile Include="source\scene.cpp" />
+    <ClCompile Include="source\SGL.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\component.h" />
     <ClInclude Include="includes\cube.h" />
+    <ClInclude Include="includes\graphics.h" />
     <ClInclude Include="includes\scene.h" />
     <ClInclude Include="includes\SGL.h" />
     <ClInclude Include="includes\camera.h" />
-    <ClInclude Include="includes\core.h" />
+    <ClInclude Include="includes\raylibUtils.h" />
     <ClInclude Include="includes\mathUtils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -16,13 +16,13 @@ namespace SGL
         float ry = ey * DEG_TO_RAD;
         float rz = ez * DEG_TO_RAD;
 
-        raylib::Quaternion Qx = raylib::QuaternionFromAxisAngle({ 1, 0, 0 }, rx);
-        raylib::Quaternion Qy = raylib::QuaternionFromAxisAngle({ 0, 1, 0 }, ry);
-        raylib::Quaternion Qz = raylib::QuaternionFromAxisAngle({ 0, 0, 1 }, rz);
+        Quaternion Qx = QuaternionFromAxisAngle({ 1, 0, 0 }, rx);
+        Quaternion Qy = QuaternionFromAxisAngle({ 0, 1, 0 }, ry);
+        Quaternion Qz = QuaternionFromAxisAngle({ 0, 0, 1 }, rz);
 
-        raylib::Quaternion Q = raylib::QuaternionMultiply(Qz,
-            raylib::QuaternionMultiply(Qy, Qx));
-        Q = raylib::QuaternionNormalize(Q);
+        Quaternion Q = QuaternionMultiply(Qz,
+            QuaternionMultiply(Qy, Qx));
+        Q = QuaternionNormalize(Q);
 
         qx = Q.x; qy = Q.y; qz = Q.z; qw = Q.w;
     }
@@ -31,8 +31,8 @@ namespace SGL
         float qx, float qy, float qz, float qw,
         float& ex, float& ey, float& ez)
     {
-        raylib::Quaternion Q = { qx, qy, qz, qw };
-        raylib::Vector3 rad = raylib::QuaternionToEuler(Q);
+        Quaternion Q = { qx, qy, qz, qw };
+        Vector3 rad = QuaternionToEuler(Q);
 
         ex = rad.x * RAD_TO_DEG;
         ey = rad.y * RAD_TO_DEG;
