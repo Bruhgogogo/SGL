@@ -52,6 +52,11 @@ namespace SGL
         T& Get(int entity);
         const T& Get(int entity) const;
 
+        int Size() const;
+        int EntityAt(int index) const;
+        T& At(int index);
+        const T& At(int index) const;
+
     private:
         std::vector<T>   data;
         std::vector<int> entities;

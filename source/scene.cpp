@@ -173,6 +173,30 @@ namespace SGL
     }
 
     template <typename T>
+    int ComponentPool<T>::Size() const
+    {
+        return (int)data.size();
+    }
+
+    template <typename T>
+    int ComponentPool<T>::EntityAt(int index) const
+    {
+        return entities[index];
+    }
+
+    template <typename T>
+    T& ComponentPool<T>::At(int index)
+    {
+        return data[index];
+    }
+
+    template <typename T>
+    const T& ComponentPool<T>::At(int index) const
+    {
+        return data[index];
+    }
+
+    template <typename T>
     void Scene::AddComponent(int handle, const T& value)
     {
         if (!IsValid(handle)) return;
@@ -506,19 +530,25 @@ namespace SGL
     {
         renderList.clear();
 
-        for (int i = 0; i < (int)alive.size(); i++)
+        ComponentPool<MeshID>& meshPool = GetPool<MeshID>();
+
+        for (int i = 0; i < meshPool.Size(); i++)
         {
-            if (!alive[i]) continue;
-            if (!HasComponent<Transform>(i)) continue;
-            if (!HasComponent<Color>(i)) continue;
-            if (!HasComponent<MeshID>(i)) continue;
-            if (!HasComponent<Visible>(i)) continue;
-            if (GetComponent<Visible>(i).value == 0) continue;
+            int entity = meshPool.EntityAt(i);
+
+            if (!IsAlive(entity)) continue;
+            if (!HasComponent<Transform>(entity)) continue;
+            if (!HasComponent<Color>(entity)) continue;
+            if (!HasComponent<Visible>(entity)) continue;
+            if (GetComponent<Visible>(entity).value == 0) continue;
+
+            const Color& color = GetComponent<Color>(entity);
+            if (color.a == 0) continue;
 
             RenderItem item;
-            item.transform = worlds[i];
-            item.color = GetComponent<Color>(i);
-            item.meshID = GetComponent<MeshID>(i).value;
+            item.transform = worlds[entity];
+            item.color = color;
+            item.meshID = meshPool.At(i).value;
 
             renderList.push_back(item);
         }

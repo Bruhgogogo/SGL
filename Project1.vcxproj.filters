@@ -55,7 +55,7 @@
       <Filter>源文件\Modules</Filter>
     </ClCompile>
     <ClCompile Include="source\sphere.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\Entites</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -87,7 +87,7 @@
       <Filter>头文件\Modules</Filter>
     </ClInclude>
     <ClInclude Include="includes\sphere.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\Entites</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
