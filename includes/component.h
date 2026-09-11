@@ -29,8 +29,17 @@ namespace SGL
 
     struct Physical
     {
+        int   anchored = 1;
+        int   canCollide = 1;
+        int   allowSleeping = 1;
+        int   isSensor = 0;
+
+        float friction = 0.5f;
+        float restitution = 0.0f;
+        float linearDamping = 0.05f;
+        float angularDamping = 0.05f;
+        float gravityFactor = 1.0f;
         float mass = 1.0f;
-        int canCollide = 1;
     };
 
     struct OBB

@@ -4,109 +4,61 @@
 
 using namespace std;
 
-static void PrintHit(const char* label, SGL_RayHit hit)
-{
-    if (hit.hit)
-    {
-        cout << label << " hit entity=" << hit.entity
-            << " point=(" << hit.pointX << ", " << hit.pointY << ", " << hit.pointZ << ")"
-            << " normal=(" << hit.normalX << ", " << hit.normalY << ", " << hit.normalZ << ")"
-            << " dist=" << hit.distance
-            << endl;
-    }
-    else
-    {
-        cout << label << " no hit" << endl;
-    }
-}
-
-static SGL_Ray MakeRay(float sx, float sy, float sz, float ex, float ey, float ez)
-{
-    SGL_Ray ray;
-    ray.startX = sx;
-    ray.startY = sy;
-    ray.startZ = sz;
-    ray.endX = ex;
-    ray.endY = ey;
-    ray.endZ = ez;
-    return ray;
-}
-
 int main()
 {
-    Graphics3D(800, 600, "SGL Capsule Cylinder Test");
+    Graphics3D(800, 600, "SGL Jolt Physics Test");
 
-    SetCameraPosition(0.0f, 6.0f, 16.0f);
-    SetCameraRotation(-20.0f, 0.0f, 0.0f);
+    SetCameraPosition(0.0f, 8.0f, 16.0f);
+    SetCameraRotation(-25.0f, 0.0f, 0.0f);
 
-    int cylA = CreateCylinder();
-    SetEntityPosition(cylA, -6.0f, 0.0f, 0.0f);
-    SetEntityScale(cylA, 1.0f, 2.0f, 1.0f);
-    SetEntityColor(cylA, 255, 80, 80, 255);
+    int ground = CreateCube();
+    SetEntityPosition(ground, 0.0f, -1.0f, 0.0f);
+    SetEntityScale(ground, 20.0f, 1.0f, 20.0f);
+    SetEntityColor(ground, 80, 80, 80, 255);
 
-    int cylB = CreateCylinder();
-    SetEntityPosition(cylB, -3.0f, 0.0f, 0.0f);
-    SetEntityScale(cylB, 1.0f, 2.0f, 1.0f);
-    SetEntityColor(cylB, 255, 160, 80, 255);
+    int ramp = CreateCube();
+    SetEntityPosition(ramp, 4.0f, 1.0f, 0.0f);
+    SetEntityRotation(ramp, 0.0f, 0.0f, -30.0f);
+    SetEntityScale(ramp, 4.0f, 0.5f, 4.0f);
+    SetEntityColor(ramp, 120, 120, 120, 255);
 
-    int capA = CreateCapsule();
-    SetEntityPosition(capA, 0.0f, 0.0f, 0.0f);
-    SetEntityScale(capA, 1.0f, 2.0f, 1.0f);
-    SetEntityColor(capA, 80, 255, 80, 255);
+    int boxA = CreateCube();
+    SetEntityPosition(boxA, -2.0f, 6.0f, 0.0f);
+    SetEntityColor(boxA, 255, 80, 80, 255);
+    SetEntityAnchored(boxA, 0);
 
-    int capB = CreateCapsule();
-    SetEntityPosition(capB, 3.0f, 0.0f, 0.0f);
-    SetEntityScale(capB, 1.0f, 2.0f, 1.0f);
-    SetEntityColor(capB, 80, 255, 160, 255);
+    int boxB = CreateCube();
+    SetEntityPosition(boxB, -1.0f, 9.0f, 0.0f);
+    SetEntityColor(boxB, 255, 160, 80, 255);
+    SetEntityAnchored(boxB, 0);
 
-    int cylC = CreateCylinder();
-    SetEntityPosition(cylC, 6.0f, 0.0f, 0.0f);
-    SetEntityScale(cylC, 1.0f, 2.0f, 1.0f);
-    SetEntityColor(cylC, 80, 80, 255, 255);
+    int boxC = CreateCube();
+    SetEntityPosition(boxC, 0.0f, 12.0f, 0.0f);
+    SetEntityColor(boxC, 255, 255, 80, 255);
+    SetEntityAnchored(boxC, 0);
 
-    cout << "=== capsule vs capsule ===" << endl;
-    cout << "capA vs capB = " << CheckCollision(capA, capB) << endl;
+    int sphere = CreateSphere();
+    SetEntityPosition(sphere, 2.0f, 6.0f, 0.0f);
+    SetEntityColor(sphere, 80, 255, 80, 255);
+    SetEntityAnchored(sphere, 0);
 
-    cout << "=== cylinder vs cylinder ===" << endl;
-    cout << "cylA vs cylB = " << CheckCollision(cylA, cylB) << endl;
+    int capsule = CreateCapsule();
+    SetEntityPosition(capsule, 4.0f, 8.0f, 0.0f);
+    SetEntityColor(capsule, 80, 255, 160, 255);
+    SetEntityAnchored(capsule, 0);
 
-    cout << "=== capsule vs cylinder ===" << endl;
-    cout << "capA vs cylC = " << CheckCollision(capA, cylC) << endl;
-
-    cout << "=== cylinder vs capsule ===" << endl;
-    cout << "cylA vs capA = " << CheckCollision(cylA, capA) << endl;
-
-    cout << "=== ray vs capsule (through capA center) ===" << endl;
-    PrintHit("capA", Raycast(MakeRay(0.0f, 0.0f, 8.0f, 0.0f, 0.0f, -8.0f)));
-
-    cout << "=== ray vs capsule (x=0.6, outside radius 0.5) ===" << endl;
-    PrintHit("capA x=0.6", Raycast(MakeRay(0.6f, 0.0f, 8.0f, 0.6f, 0.0f, -8.0f)));
-
-    cout << "=== ray vs capsule (x=0.4, inside radius 0.5) ===" << endl;
-    PrintHit("capA x=0.4", Raycast(MakeRay(0.4f, 0.0f, 8.0f, 0.4f, 0.0f, -8.0f)));
-
-    cout << "=== ray vs cylinder (through cylA center) ===" << endl;
-    PrintHit("cylA", Raycast(MakeRay(-6.0f, 0.0f, 8.0f, -6.0f, 0.0f, -8.0f)));
-
-    cout << "=== ray vs cylinder (x=-5.6, inside radius 0.5) ===" << endl;
-    PrintHit("cylA x=-5.6", Raycast(MakeRay(-5.6f, 0.0f, 8.0f, -5.6f, 0.0f, -8.0f)));
-
-    cout << "=== ray vs cylinder (x=-5.4, outside radius 0.5) ===" << endl;
-    PrintHit("cylA x=-5.4", Raycast(MakeRay(-5.4f, 0.0f, 8.0f, -5.4f, 0.0f, -8.0f)));
-
-    cout << "=== ray vs cylinder (y=0.9, inside half-height 1.0) ===" << endl;
-    PrintHit("cylA y=0.9", Raycast(MakeRay(-6.0f, 0.9f, 8.0f, -6.0f, 0.9f, -8.0f)));
-
-    cout << "=== ray vs cylinder (y=1.1, outside half-height 1.0) ===" << endl;
-    PrintHit("cylA y=1.1", Raycast(MakeRay(-6.0f, 1.1f, 8.0f, -6.0f, 1.1f, -8.0f)));
-
-    cout << "=== ray vs cylinder (top cap, along -Y) ===" << endl;
-    PrintHit("cylA top", Raycast(MakeRay(-6.0f, 8.0f, 0.0f, -6.0f, -8.0f, 0.0f)));
+    int cylinder = CreateCylinder();
+    SetEntityPosition(cylinder, -4.0f, 8.0f, 0.0f);
+    SetEntityColor(cylinder, 80, 80, 255, 255);
+    SetEntityAnchored(cylinder, 0);
 
     while (!IsWindowShouldClose())
     {
+        UpdateWorld();
         RenderWorld();
     }
+
+    ShutdownSGL();
 
     return 0;
 }

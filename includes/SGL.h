@@ -50,6 +50,7 @@ extern "C" {
 #endif
 
     SGL_API void Graphics3D(int width, int height, const char* title);
+    SGL_API void ShutdownSGL();
     SGL_API SGL_BOOL IsWindowShouldClose();
 
     SGL_API void GetWindowWidth(int* width);
@@ -107,10 +108,42 @@ extern "C" {
     SGL_API void SetEntityCollide(int handle, int canCollide);
     SGL_API SGL_BOOL  GetEntityCollide(int handle);
 
+    SGL_API void SetEntityAnchored(int handle, int anchored);
+    SGL_API SGL_BOOL GetEntityAnchored(int handle);
+
+    SGL_API void SetEntityAllowSleeping(int handle, int allow);
+    SGL_API SGL_BOOL GetEntityAllowSleeping(int handle);
+
+    SGL_API void SetEntitySensor(int handle, int sensor);
+    SGL_API SGL_BOOL GetEntitySensor(int handle);
+
+    SGL_API void SetEntityFriction(int handle, float friction);
+    SGL_API float GetEntityFriction(int handle);
+
+    SGL_API void SetEntityRestitution(int handle, float restitution);
+    SGL_API float GetEntityRestitution(int handle);
+
+    SGL_API void SetEntityLinearDamping(int handle, float damping);
+    SGL_API float GetEntityLinearDamping(int handle);
+
+    SGL_API void SetEntityAngularDamping(int handle, float damping);
+    SGL_API float GetEntityAngularDamping(int handle);
+
+    SGL_API void SetEntityGravityFactor(int handle, float factor);
+    SGL_API float GetEntityGravityFactor(int handle);
+
     SGL_API void SetEntityMass(int handle, float mass);
     SGL_API float GetEntityMass(int handle);
 
-    SGL_API SGL_BOOL  CheckCollision(int a, int b);
+    SGL_API void SetEntityVelocity(int handle, float vx, float vy, float vz);
+    SGL_API void GetEntityVelocity(int handle, float* vx, float* vy, float* vz);
+
+    SGL_API void ApplyEntityImpulse(int handle, float fx, float fy, float fz);
+
+    SGL_API void SetEntityAngularVelocity(int handle, float wx, float wy, float wz);
+    SGL_API void GetEntityAngularVelocity(int handle, float* wx, float* wy, float* wz);
+
+    SGL_API void ApplyEntityAngularImpulse(int handle, float wx, float wy, float wz);
 
     SGL_API SGL_RayHit Raycast(SGL_Ray ray);
 

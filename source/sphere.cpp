@@ -1,4 +1,5 @@
 #include "sphere.h"
+#include "physical.h"
 
 // ====================================================================================================
 // NAMESPACE
@@ -38,6 +39,16 @@ namespace SGL
         scene.AddComponent<Sphere>(handle, sphere);
 
         scene.UpdateEntityTree(handle);
+
+        GetJoltWorldInstance().CreateBody(
+            handle,
+            scene.GetWorldTransform(handle),
+            scene.GetComponent<Physical>(handle),
+            nullptr,
+            &scene.GetComponent<Sphere>(handle),
+            nullptr,
+            nullptr
+        );
 
         return handle;
     }

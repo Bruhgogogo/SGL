@@ -30,9 +30,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -57,11 +54,11 @@
     <ClCompile Include="source\sphere.cpp">
       <Filter>源文件\Entites</Filter>
     </ClCompile>
-    <ClCompile Include="source\capsule.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="source\cylinder.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\Entites</Filter>
+    </ClCompile>
+    <ClCompile Include="source\capsule.cpp">
+      <Filter>源文件\Entites</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -95,11 +92,17 @@
     <ClInclude Include="includes\sphere.h">
       <Filter>头文件\Entites</Filter>
     </ClInclude>
-    <ClInclude Include="includes\capsule.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="includes\cylinder.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\Entites</Filter>
     </ClInclude>
+    <ClInclude Include="includes\capsule.h">
+      <Filter>头文件\Entites</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="libs\Jolt_Debug.lib" />
+    <Library Include="libs\Jolt_Release.lib" />
+    <Library Include="libs\Raylib_Debug.lib" />
+    <Library Include="libs\Raylib_Release.lib" />
   </ItemGroup>
 </Project>

@@ -375,6 +375,18 @@ namespace SGL
         return parents[handle];
     }
 
+    int Scene::GetFirstChild(int handle) const
+    {
+        if (!IsValid(handle)) return INVALID_HANDLE;
+        return firstChilds[handle];
+    }
+
+    int Scene::GetNextSibling(int handle) const
+    {
+        if (!IsValid(handle)) return INVALID_HANDLE;
+        return nextSiblings[handle];
+    }
+
     void Scene::UpdateWorldRecursive(int handle, const Transform& parentWorld, bool hasParentWorld)
     {
         bool hasLocal = HasComponent<Transform>(handle);
@@ -387,6 +399,13 @@ namespace SGL
                 worlds[handle] = ComposeWorld(parentWorld, local);
             else
                 worlds[handle] = local;
+
+            if (HasComponent<Capsule>(handle) || HasComponent<Cylinder>(handle))
+            {
+                float maxRadial = fmaxf(worlds[handle].scale.x, worlds[handle].scale.z);
+                worlds[handle].scale.x = maxRadial;
+                worlds[handle].scale.z = maxRadial;
+            }
 
             worlds[handle].matrixDirty = 1;
 
@@ -455,6 +474,12 @@ namespace SGL
 
         GetComponent<Transform>(handle).position = { x, y, z };
         UpdateEntityTree(handle);
+
+        if (!HasComponent<Physical>(handle)) return;
+
+        if (GetComponent<Physical>(handle).anchored) return;
+
+        GetJoltWorldInstance().TeleportBody(handle, x, y, z);
     }
 
     void Scene::GetEntityPosition(int handle, float* x, float* y, float* z)
@@ -581,6 +606,47 @@ namespace SGL
     int Scene::GetEntityCount() const
     {
         return (int)alive.size();
+    }
+
+    Transform& Scene::GetWorldTransform(int handle)
+    {
+        return worlds[handle];
+    }
+
+    const Transform& Scene::GetWorldTransform(int handle) const
+    {
+        return worlds[handle];
+    }
+
+    void Scene::SetWorldTransform(int handle, const Transform& world)
+    {
+        if (!IsValid(handle)) return;
+
+        worlds[handle] = world;
+
+        if (HasComponent<Transform>(handle))
+        {
+            Transform parentWorld = IdentityTransform();
+            bool hasParentWorld = false;
+
+            if (parents[handle] != INVALID_HANDLE)
+            {
+                int p = parents[handle];
+
+                if (HasComponent<Transform>(p))
+                {
+                    parentWorld = worlds[p];
+                    hasParentWorld = true;
+                }
+            }
+
+            if (hasParentWorld)
+                GetComponent<Transform>(handle) = InverseComposeWorld(parentWorld, world);
+            else
+                GetComponent<Transform>(handle) = world;
+
+            UpdateEntityTree(handle);
+        }
     }
 
     // ====================================================================================================

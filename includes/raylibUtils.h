@@ -1,14 +1,19 @@
 #pragma once
 
-#include <raylib.hpp>
-#include <RaylibException.hpp>
-#include <raymath.hpp>
+#include <Raylib/raylib.h>
+#include <Raylib/raymath.h>
 
-#pragma once
+#ifdef _WIN32
 
-#include <raylib.hpp>
-#include <RaylibException.hpp>
-#include <raymath.hpp>
+#pragma comment(lib, "winmm.lib")
+
+#ifdef _DEBUG
+#pragma comment(lib, "Raylib_Debug.lib")
+#else
+#pragma comment(lib, "Raylib_Release.lib")
+#endif
+
+#endif
 
 #include <vector>
 

@@ -1,4 +1,5 @@
 #include "cube.h"
+#include "physical.h"
 
 // ====================================================================================================
 // NAMESPACE
@@ -31,6 +32,16 @@ namespace SGL
         scene.AddComponent<OBB>(handle, box);
 
         scene.UpdateEntityTree(handle);
+
+        GetJoltWorldInstance().CreateBody(
+            handle,
+            scene.GetWorldTransform(handle),
+            scene.GetComponent<Physical>(handle),
+            &scene.GetComponent<OBB>(handle),
+            nullptr,
+            nullptr,
+            nullptr
+        );
 
         return handle;
     }

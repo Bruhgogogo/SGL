@@ -79,6 +79,9 @@ namespace SGL
         void SetParent(int child, int parent);
         int  GetParent(int handle) const;
 
+        int  GetFirstChild(int handle) const;
+        int  GetNextSibling(int handle) const;
+
         template <typename T>
         void AddComponent(int handle, const T& value);
 
@@ -114,6 +117,11 @@ namespace SGL
         void SetEntityMeshID(int handle, int meshID);
 
         int GetEntityCount() const;
+
+        Transform& GetWorldTransform(int handle);
+        const Transform& GetWorldTransform(int handle) const;
+
+        void SetWorldTransform(int handle, const Transform& world);
 
     private:
         std::vector<int> parents;

@@ -1,4 +1,5 @@
 #include "cylinder.h"
+#include "physical.h"
 
 // ====================================================================================================
 // NAMESPACE
@@ -39,6 +40,16 @@ namespace SGL
         scene.AddComponent<Cylinder>(handle, cylinder);
 
         scene.UpdateEntityTree(handle);
+
+        GetJoltWorldInstance().CreateBody(
+            handle,
+            scene.GetWorldTransform(handle),
+            scene.GetComponent<Physical>(handle),
+            nullptr,
+            nullptr,
+            nullptr,
+            &scene.GetComponent<Cylinder>(handle)
+        );
 
         return handle;
     }

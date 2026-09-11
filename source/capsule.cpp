@@ -1,4 +1,5 @@
 #include "capsule.h"
+#include "physical.h"
 
 // ====================================================================================================
 // NAMESPACE
@@ -39,6 +40,16 @@ namespace SGL
         scene.AddComponent<Capsule>(handle, capsule);
 
         scene.UpdateEntityTree(handle);
+
+        GetJoltWorldInstance().CreateBody(
+            handle,
+            scene.GetWorldTransform(handle),
+            scene.GetComponent<Physical>(handle),
+            nullptr,
+            nullptr,
+            &scene.GetComponent<Capsule>(handle),
+            nullptr
+        );
 
         return handle;
     }
