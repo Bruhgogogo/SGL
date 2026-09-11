@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "graphics.h"
 #include "cube.h"
+#include "sphere.h"
 #include "raylibUtils.h"
 #include "physical.h"
 
@@ -150,6 +151,11 @@ SGL_API void GetEntityLocalScale(int handle, float* sx, float* sy, float* sz)
 SGL_API int CreateCube()
 {
     return SGL::CreateCube();
+}
+
+SGL_API int CreateSphere()
+{
+    return SGL::CreateSphere();
 }
 
 SGL_API void SetEntityColor(int handle, unsigned char r, unsigned char g, unsigned char b, unsigned char a)

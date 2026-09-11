@@ -371,6 +371,12 @@ namespace SGL
                 OBB& obb = GetComponent<OBB>(handle);
                 PhysicalComputeOBB(worlds[handle], obb);
             }
+
+            if (HasComponent<Sphere>(handle))
+            {
+                Sphere& sphere = GetComponent<Sphere>(handle);
+                PhysicalComputeSphere(worlds[handle], sphere);
+            }
         }
 
         Transform currentWorld = hasLocal ? worlds[handle] : parentWorld;
@@ -544,5 +550,6 @@ namespace SGL
     SGL_INSTANTIATE_COMPONENT(Visible);
     SGL_INSTANTIATE_COMPONENT(Physical);
     SGL_INSTANTIATE_COMPONENT(OBB);
+    SGL_INSTANTIATE_COMPONENT(Sphere);
     SGL_INSTANTIATE_COMPONENT(MeshID);
 }

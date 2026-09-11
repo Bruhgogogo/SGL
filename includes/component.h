@@ -44,6 +44,16 @@ namespace SGL
         Quaternion worldRotation = QuaternionIdentity();
     };
 
+    struct Sphere
+    {
+        Vector3 localCenter = { 0, 0, 0 };
+        float   localRadius = 0.5f;
+
+        Vector3 worldCenter = { 0, 0, 0 };
+        Vector3 worldRadii = { 0.5f, 0.5f, 0.5f };
+        float   worldMaxRadius = 0.5f;
+    };
+
     struct MeshID
     {
         int value = 0;

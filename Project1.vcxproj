@@ -151,6 +151,7 @@
     <ClCompile Include="source\physical.cpp" />
     <ClCompile Include="source\scene.cpp" />
     <ClCompile Include="source\SGL.cpp" />
+    <ClCompile Include="source\sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\component.h" />
@@ -162,6 +163,7 @@
     <ClInclude Include="includes\camera.h" />
     <ClInclude Include="includes\raylibUtils.h" />
     <ClInclude Include="includes\mathUtils.h" />
+    <ClInclude Include="includes\sphere.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

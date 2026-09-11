@@ -89,6 +89,7 @@ extern "C" {
     SGL_API void GetEntityLocalScale(int handle, float* sx, float* sy, float* sz);
 
     SGL_API int  CreateCube();
+    SGL_API int  CreateSphere();
 
     SGL_API void SetEntityColor(int handle, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
     SGL_API void GetEntityColor(int handle, unsigned char* r, unsigned char* g, unsigned char* b, unsigned char* a);

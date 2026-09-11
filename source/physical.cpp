@@ -179,6 +179,91 @@ namespace SGL
         return true;
     }
 
+    static bool RaySphereIntersect(
+        SGL_Ray ray,
+        const Sphere& sphere,
+        float& tHit,
+        Vector3& normal)
+    {
+        Vector3 rayStart = { ray.startX, ray.startY, ray.startZ };
+        Vector3 rayEnd = { ray.endX, ray.endY, ray.endZ };
+
+        Vector3 radii = sphere.worldRadii;
+
+        if (radii.x < 1e-8f || radii.y < 1e-8f || radii.z < 1e-8f)
+            return false;
+
+        Vector3 invRadii = { 1.0f / radii.x, 1.0f / radii.y, 1.0f / radii.z };
+
+        Vector3 localStart = Vector3Subtract(rayStart, sphere.worldCenter);
+        localStart = { localStart.x * invRadii.x, localStart.y * invRadii.y, localStart.z * invRadii.z };
+
+        Vector3 localEnd = Vector3Subtract(rayEnd, sphere.worldCenter);
+        localEnd = { localEnd.x * invRadii.x, localEnd.y * invRadii.y, localEnd.z * invRadii.z };
+
+        Vector3 dir = Vector3Subtract(localEnd, localStart);
+
+        float a = Vector3DotProduct(dir, dir);
+        float b = 2.0f * Vector3DotProduct(localStart, dir);
+        float c = Vector3DotProduct(localStart, localStart) - 1.0f;
+
+        float discriminant = b * b - 4.0f * a * c;
+
+        if (discriminant < 0.0f)
+            return false;
+
+        float sqrtDisc = sqrtf(discriminant);
+        float inv2a = 1.0f / (2.0f * a);
+
+        float t0 = (-b - sqrtDisc) * inv2a;
+        float t1 = (-b + sqrtDisc) * inv2a;
+
+        float t = t0;
+
+        if (t < 0.0f)
+            t = t1;
+
+        if (t < 0.0f || t > 1.0f)
+            return false;
+
+        Vector3 localPoint = Vector3Add(localStart, Vector3Scale(dir, t));
+
+        Vector3 localNormal = localPoint;
+        Vector3 worldNormal = {
+            localNormal.x * invRadii.x,
+            localNormal.y * invRadii.y,
+            localNormal.z * invRadii.z
+        };
+        worldNormal = Vector3Normalize(worldNormal);
+
+        tHit = t;
+        normal = worldNormal;
+
+        return true;
+    }
+
+    static bool SphereSphereIntersect(const Sphere& a, const Sphere& b)
+    {
+        float dist = Vector3Distance(a.worldCenter, b.worldCenter);
+        return dist <= a.worldMaxRadius + b.worldMaxRadius;
+    }
+
+    static bool SphereOBBIntersect(const Sphere& s, const OBB& o)
+    {
+        Vector3 localCenter = Vector3Subtract(s.worldCenter, o.worldCenter);
+        localCenter = Vector3RotateByQuaternion(localCenter, QuaternionInvert(o.worldRotation));
+
+        Vector3 closest = {
+            fmaxf(-o.worldHalfExtents.x, fminf(localCenter.x, o.worldHalfExtents.x)),
+            fmaxf(-o.worldHalfExtents.y, fminf(localCenter.y, o.worldHalfExtents.y)),
+            fmaxf(-o.worldHalfExtents.z, fminf(localCenter.z, o.worldHalfExtents.z))
+        };
+
+        float dist = Vector3Distance(localCenter, closest);
+
+        return dist <= s.worldMaxRadius;
+    }
+
     // ====================================================================================================
     // APIs
     // ====================================================================================================
@@ -203,14 +288,32 @@ namespace SGL
         obb.worldRotation = QuaternionMultiply(world.rotation, obb.localRotation);
     }
 
+    void PhysicalComputeSphere(const Transform& world, Sphere& sphere)
+    {
+        Vector3 scaledCenter = {
+            sphere.localCenter.x * world.scale.x,
+            sphere.localCenter.y * world.scale.y,
+            sphere.localCenter.z * world.scale.z
+        };
+
+        Vector3 rotatedCenter = Vector3RotateByQuaternion(scaledCenter, world.rotation);
+        sphere.worldCenter = Vector3Add(world.position, rotatedCenter);
+
+        sphere.worldRadii = {
+            sphere.localRadius * world.scale.x,
+            sphere.localRadius * world.scale.y,
+            sphere.localRadius * world.scale.z
+        };
+
+        float maxScale = fmaxf(world.scale.x, fmaxf(world.scale.y, world.scale.z));
+        sphere.worldMaxRadius = sphere.localRadius * maxScale;
+    }
+
     int PhysicalCheckCollision(int a, int b)
     {
         Scene& scene = GetSceneInstance();
 
         if (!scene.IsAlive(a) || !scene.IsAlive(b)) return 0;
-
-        if (!scene.HasComponent<OBB>(a)) return 0;
-        if (!scene.HasComponent<OBB>(b)) return 0;
 
         if (!scene.HasComponent<Physical>(a)) return 0;
         if (!scene.HasComponent<Physical>(b)) return 0;
@@ -218,10 +321,40 @@ namespace SGL
         if (scene.GetComponent<Physical>(a).canCollide == 0) return 0;
         if (scene.GetComponent<Physical>(b).canCollide == 0) return 0;
 
-        const OBB& boxA = scene.GetComponent<OBB>(a);
-        const OBB& boxB = scene.GetComponent<OBB>(b);
+        bool hasObbA = scene.HasComponent<OBB>(a);
+        bool hasObbB = scene.HasComponent<OBB>(b);
+        bool hasSphereA = scene.HasComponent<Sphere>(a);
+        bool hasSphereB = scene.HasComponent<Sphere>(b);
 
-        return OBBIntersect(boxA, boxB) ? 1 : 0;
+        if (hasSphereA && hasSphereB)
+        {
+            const Sphere& sA = scene.GetComponent<Sphere>(a);
+            const Sphere& sB = scene.GetComponent<Sphere>(b);
+            return SphereSphereIntersect(sA, sB) ? 1 : 0;
+        }
+
+        if (hasSphereA && hasObbB)
+        {
+            const Sphere& sA = scene.GetComponent<Sphere>(a);
+            const OBB& boxB = scene.GetComponent<OBB>(b);
+            return SphereOBBIntersect(sA, boxB) ? 1 : 0;
+        }
+
+        if (hasObbA && hasSphereB)
+        {
+            const OBB& boxA = scene.GetComponent<OBB>(a);
+            const Sphere& sB = scene.GetComponent<Sphere>(b);
+            return SphereOBBIntersect(sB, boxA) ? 1 : 0;
+        }
+
+        if (hasObbA && hasObbB)
+        {
+            const OBB& boxA = scene.GetComponent<OBB>(a);
+            const OBB& boxB = scene.GetComponent<OBB>(b);
+            return OBBIntersect(boxA, boxB) ? 1 : 0;
+        }
+
+        return 0;
     }
 
     SGL_RayHit PhysicalRaycast(SGL_Ray ray)
@@ -240,17 +373,28 @@ namespace SGL
         for (int i = 0; i < (int)scene.GetEntityCount(); i++)
         {
             if (!scene.IsAlive(i)) continue;
-            if (!scene.HasComponent<OBB>(i)) continue;
             if (!scene.HasComponent<Physical>(i)) continue;
             if (scene.GetComponent<Physical>(i).canCollide == 0) continue;
-
-            const OBB& obb = scene.GetComponent<OBB>(i);
 
             float tHit = 0.0f;
             Vector3 normal = { 0, 0, 0 };
 
-            if (!RayOBBIntersect(ray, obb, tHit, normal))
+            if (scene.HasComponent<Sphere>(i))
+            {
+                const Sphere& sphere = scene.GetComponent<Sphere>(i);
+                if (!RaySphereIntersect(ray, sphere, tHit, normal))
+                    continue;
+            }
+            else if (scene.HasComponent<OBB>(i))
+            {
+                const OBB& obb = scene.GetComponent<OBB>(i);
+                if (!RayOBBIntersect(ray, obb, tHit, normal))
+                    continue;
+            }
+            else
+            {
                 continue;
+            }
 
             if (tHit >= closest)
                 continue;

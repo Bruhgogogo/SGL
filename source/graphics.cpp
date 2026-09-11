@@ -15,6 +15,9 @@ namespace SGL
     static Model CubeModel = {};
     static bool CubeModelLoaded = false;
 
+    static Model SphereModel = {};
+    static bool SphereModelLoaded = false;
+
     // ====================================================================================================
     // UTILS
     // ====================================================================================================
@@ -26,6 +29,15 @@ namespace SGL
         Mesh mesh = GenMeshCube(1.0f, 1.0f, 1.0f);
         CubeModel = LoadModelFromMesh(mesh);
         CubeModelLoaded = true;
+    }
+
+    static void EnsureSphereModel()
+    {
+        if (SphereModelLoaded) return;
+
+        Mesh mesh = GenMeshSphere(0.5f, 16, 16);
+        SphereModel = LoadModelFromMesh(mesh);
+        SphereModelLoaded = true;
     }
 
     static Matrix MakeTransformMatrix(const Transform& t)
@@ -103,6 +115,7 @@ namespace SGL
     void GraphicsRender()
     {
         EnsureCubeModel();
+        EnsureSphereModel();
 
         InternalCamera& camera = GetCameraInstance();
         camera.UpdateCamera();
@@ -122,18 +135,22 @@ namespace SGL
         {
             const RenderItem& item = list[i];
 
+            ::Color color = {
+                item.color.r,
+                item.color.g,
+                item.color.b,
+                item.color.a
+            };
+
             if (item.meshID == 0)
             {
                 CubeModel.transform = MakeTransformMatrix(item.transform);
-
-                ::Color color = {
-                    item.color.r,
-                    item.color.g,
-                    item.color.b,
-                    item.color.a
-                };
-
                 DrawModel(CubeModel, { 0, 0, 0 }, 1.0f, color);
+            }
+            else if (item.meshID == 1)
+            {
+                SphereModel.transform = MakeTransformMatrix(item.transform);
+                DrawModel(SphereModel, { 0, 0, 0 }, 1.0f, color);
             }
         }
 
