@@ -16,6 +16,8 @@ namespace SGL
 
     void PhysicalComputeOBB(const Transform& world, OBB& obb);
     void PhysicalComputeSphere(const Transform& world, Sphere& sphere);
+    void PhysicalComputeCapsule(const Transform& world, Capsule& capsule);
+    void PhysicalComputeCylinder(const Transform& world, Cylinder& cylinder);
 
     int  PhysicalCheckCollision(int a, int b);
     SGL_RayHit PhysicalRaycast(SGL_Ray ray);

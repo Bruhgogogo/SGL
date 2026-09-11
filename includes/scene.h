@@ -152,6 +152,8 @@ namespace SGL
     SGL_DECLARE_COMPONENT(Physical);
     SGL_DECLARE_COMPONENT(OBB);
     SGL_DECLARE_COMPONENT(Sphere);
+    SGL_DECLARE_COMPONENT(Capsule);
+    SGL_DECLARE_COMPONENT(Cylinder);
     SGL_DECLARE_COMPONENT(MeshID);
 
     // ====================================================================================================

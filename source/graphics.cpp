@@ -18,6 +18,12 @@ namespace SGL
     static Model SphereModel = {};
     static bool SphereModelLoaded = false;
 
+    static Model CapsuleModel = {};
+    static bool CapsuleModelLoaded = false;
+
+    static Model CylinderModel = {};
+    static bool CylinderModelLoaded = false;
+
     // ====================================================================================================
     // UTILS
     // ====================================================================================================
@@ -38,6 +44,24 @@ namespace SGL
         Mesh mesh = GenMeshSphere(0.5f, 16, 16);
         SphereModel = LoadModelFromMesh(mesh);
         SphereModelLoaded = true;
+    }
+
+    static void EnsureCapsuleModel()
+    {
+        if (CapsuleModelLoaded) return;
+
+        Mesh mesh = GenMeshCapsule(0.5f, 1.0f, 16, 16);
+        CapsuleModel = LoadModelFromMesh(mesh);
+        CapsuleModelLoaded = true;
+    }
+
+    static void EnsureCylinderModel()
+    {
+        if (CylinderModelLoaded) return;
+
+        Mesh mesh = GenMeshCylinder(0.5f, 1.0f, 16);
+        CylinderModel = LoadModelFromMesh(mesh);
+        CylinderModelLoaded = true;
     }
 
     static Matrix MakeTransformMatrix(const Transform& t)
@@ -116,6 +140,8 @@ namespace SGL
     {
         EnsureCubeModel();
         EnsureSphereModel();
+        EnsureCapsuleModel();
+        EnsureCylinderModel();
 
         InternalCamera& camera = GetCameraInstance();
         camera.UpdateCamera();
@@ -151,6 +177,16 @@ namespace SGL
             {
                 SphereModel.transform = MakeTransformMatrix(item.transform);
                 DrawModel(SphereModel, { 0, 0, 0 }, 1.0f, color);
+            }
+            else if (item.meshID == 2)
+            {
+                CapsuleModel.transform = MakeTransformMatrix(item.transform);
+                DrawModel(CapsuleModel, { 0, 0, 0 }, 1.0f, color);
+            }
+            else if (item.meshID == 3)
+            {
+                CylinderModel.transform = MakeTransformMatrix(item.transform);
+                DrawModel(CylinderModel, { 0, 0, 0 }, 1.0f, color);
             }
         }
 

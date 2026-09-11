@@ -54,6 +54,30 @@ namespace SGL
         float   worldMaxRadius = 0.5f;
     };
 
+    struct Capsule
+    {
+        Vector3    localCenter = { 0, 0, 0 };
+        float      localRadius = 0.5f;
+        float      localHeight = 1.0f;
+
+        Vector3    worldCenter = { 0, 0, 0 };
+        float      worldRadius = 0.5f;
+        float      worldHeight = 1.0f;
+        Quaternion worldRotation = QuaternionIdentity();
+    };
+
+    struct Cylinder
+    {
+        Vector3    localCenter = { 0, 0, 0 };
+        float      localRadius = 0.5f;
+        float      localHeight = 1.0f;
+
+        Vector3    worldCenter = { 0, 0, 0 };
+        float      worldRadius = 0.5f;
+        float      worldHeight = 1.0f;
+        Quaternion worldRotation = QuaternionIdentity();
+    };
+
     struct MeshID
     {
         int value = 0;

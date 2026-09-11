@@ -90,6 +90,8 @@ extern "C" {
 
     SGL_API int  CreateCube();
     SGL_API int  CreateSphere();
+    SGL_API int  CreateCapsule();
+    SGL_API int  CreateCylinder();
 
     SGL_API void SetEntityColor(int handle, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
     SGL_API void GetEntityColor(int handle, unsigned char* r, unsigned char* g, unsigned char* b, unsigned char* a);
@@ -98,15 +100,21 @@ extern "C" {
     SGL_API SGL_BOOL  GetEntityVisible(int handle);
 
     SGL_API void SetEntityMeshID(int handle, int meshID);
+    SGL_API int  GetEntityMeshID(int handle);
 
     SGL_API SGL_BOOL IsEntityValid(int handle);
 
     SGL_API void SetEntityCollide(int handle, int canCollide);
     SGL_API SGL_BOOL  GetEntityCollide(int handle);
 
+    SGL_API void SetEntityMass(int handle, float mass);
+    SGL_API float GetEntityMass(int handle);
+
     SGL_API SGL_BOOL  CheckCollision(int a, int b);
 
     SGL_API SGL_RayHit Raycast(SGL_Ray ray);
+
+    SGL_API double GetElapsedTime();
 
 #ifdef __cplusplus
 }

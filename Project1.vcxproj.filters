@@ -57,6 +57,12 @@
     <ClCompile Include="source\sphere.cpp">
       <Filter>源文件\Entites</Filter>
     </ClCompile>
+    <ClCompile Include="source\capsule.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\cylinder.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\SGL.h">
@@ -88,6 +94,12 @@
     </ClInclude>
     <ClInclude Include="includes\sphere.h">
       <Filter>头文件\Entites</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\capsule.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\cylinder.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

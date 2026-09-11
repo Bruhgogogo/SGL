@@ -401,6 +401,18 @@ namespace SGL
                 Sphere& sphere = GetComponent<Sphere>(handle);
                 PhysicalComputeSphere(worlds[handle], sphere);
             }
+
+            if (HasComponent<Capsule>(handle))
+            {
+                Capsule& capsule = GetComponent<Capsule>(handle);
+                PhysicalComputeCapsule(worlds[handle], capsule);
+            }
+
+            if (HasComponent<Cylinder>(handle))
+            {
+                Cylinder& cylinder = GetComponent<Cylinder>(handle);
+                PhysicalComputeCylinder(worlds[handle], cylinder);
+            }
         }
 
         Transform currentWorld = hasLocal ? worlds[handle] : parentWorld;
@@ -581,5 +593,7 @@ namespace SGL
     SGL_INSTANTIATE_COMPONENT(Physical);
     SGL_INSTANTIATE_COMPONENT(OBB);
     SGL_INSTANTIATE_COMPONENT(Sphere);
+    SGL_INSTANTIATE_COMPONENT(Capsule);
+    SGL_INSTANTIATE_COMPONENT(Cylinder);
     SGL_INSTANTIATE_COMPONENT(MeshID);
 }

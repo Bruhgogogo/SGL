@@ -5,6 +5,8 @@
 #include "graphics.h"
 #include "cube.h"
 #include "sphere.h"
+#include "capsule.h"
+#include "cylinder.h"
 #include "raylibUtils.h"
 #include "physical.h"
 
@@ -158,6 +160,16 @@ SGL_API int CreateSphere()
     return SGL::CreateSphere();
 }
 
+SGL_API int CreateCapsule()
+{
+    return SGL::CreateCapsule();
+}
+
+SGL_API int CreateCylinder()
+{
+    return SGL::CreateCylinder();
+}
+
 SGL_API void SetEntityColor(int handle, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Color>(handle)) return;
@@ -201,6 +213,13 @@ SGL_API void SetEntityMeshID(int handle, int meshID)
     SGL::GetSceneInstance().SetEntityMeshID(handle, meshID);
 }
 
+SGL_API int GetEntityMeshID(int handle)
+{
+    if (!SGL::GetSceneInstance().HasComponent<SGL::MeshID>(handle)) return -1;
+
+    return SGL::GetSceneInstance().GetComponent<SGL::MeshID>(handle).value;
+}
+
 SGL_API SGL_BOOL IsEntityValid(int handle)
 {
     return SGL::GetSceneInstance().IsAlive(handle) ? 1 : 0;
@@ -220,6 +239,20 @@ SGL_API SGL_BOOL GetEntityCollide(int handle)
     return SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).canCollide;
 }
 
+SGL_API void SetEntityMass(int handle, float mass)
+{
+    if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return;
+
+    SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).mass = mass;
+}
+
+SGL_API float GetEntityMass(int handle)
+{
+    if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return 0.0f;
+
+    return SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).mass;
+}
+
 SGL_API SGL_BOOL CheckCollision(int a, int b)
 {
     return SGL::PhysicalCheckCollision(a, b) ? 1 : 0;
@@ -228,4 +261,9 @@ SGL_API SGL_BOOL CheckCollision(int a, int b)
 SGL_API SGL_RayHit Raycast(SGL_Ray ray)
 {
     return SGL::PhysicalRaycast(ray);
+}
+
+SGL_API double GetElapsedTime()
+{
+    return ::GetTime();
 }
