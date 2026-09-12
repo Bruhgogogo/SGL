@@ -111,7 +111,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)includes;$(ProjectDir)third_party;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -602,10 +602,10 @@
     <ClInclude Include="includes\raylibUtils.h" />
     <ClInclude Include="includes\mathUtils.h" />
     <ClInclude Include="includes\sphere.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="libs\Raylib_Debug.lib" />
-    <Library Include="libs\Raylib_Release.lib" />
+    <ClInclude Include="third_party\Raylib\raylib.h" />
+    <ClInclude Include="third_party\Raylib\raymath.h" />
+    <ClInclude Include="third_party\Raylib\rcamera.h" />
+    <ClInclude Include="third_party\Raylib\rlgl.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="third_party\Jolt\Core\FixedSizeFreeList.inl" />
@@ -627,6 +627,10 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="third_party\Jolt\Jolt.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="libs\Raylib_Debug.lib" />
+    <Library Include="libs\Raylib_Release.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

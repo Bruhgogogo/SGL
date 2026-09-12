@@ -1402,10 +1402,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="libs\Raylib_Debug.lib" />
-    <Library Include="libs\Raylib_Release.lib" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="third_party\Jolt\Jolt.cmake" />
     <None Include="third_party\Jolt\Physics\Collision\Shape\TaperedCapsuleShape.gliffy" />
     <None Include="third_party\Jolt\Physics\Body\Body.inl">
