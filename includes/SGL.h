@@ -13,7 +13,13 @@
 #endif
 #endif
 
+typedef int SGL_ENTITY;
 typedef int SGL_BOOL;
+
+typedef SGL_ENTITY SGL_MESH;
+
+SGL_BOOL SGL_TRUE = 1;
+SGL_BOOL SGL_FALSE = 0;
 
 typedef enum
 {
@@ -68,82 +74,82 @@ extern "C" {
     SGL_API void SetCameraFOV(float fov);
     SGL_API void GetCameraFOV(float* fov);
 
-    SGL_API int  CreateEntity();
-    SGL_API void DestroyEntity(int handle);
+    SGL_API SGL_ENTITY  CreateEntity();
+    SGL_API void DestroyEntity(SGL_ENTITY handle);
 
-    SGL_API void SetParent(int child, int parent);
-    SGL_API int  GetParent(int handle);
+    SGL_API void SetParent(SGL_ENTITY child, SGL_ENTITY parent);
+    SGL_API SGL_ENTITY  GetParent(SGL_ENTITY handle);
 
     SGL_API void UpdateWorld();
     SGL_API void RenderWorld();
 
-    SGL_API void SetEntityPosition(int handle, float x, float y, float z);
-    SGL_API void GetEntityPosition(int handle, float* x, float* y, float* z);
-    SGL_API void GetEntityLocalPosition(int handle, float* x, float* y, float* z);
+    SGL_API void SetEntityPosition(SGL_ENTITY handle, float x, float y, float z);
+    SGL_API void GetEntityPosition(SGL_ENTITY handle, float* x, float* y, float* z);
+    SGL_API void GetEntityLocalPosition(SGL_ENTITY handle, float* x, float* y, float* z);
 
-    SGL_API void SetEntityRotation(int handle, float pitch, float yaw, float roll);
-    SGL_API void GetEntityRotation(int handle, float* pitch, float* yaw, float* roll);
-    SGL_API void GetEntityLocalRotation(int handle, float* pitch, float* yaw, float* roll);
+    SGL_API void SetEntityRotation(SGL_ENTITY handle, float pitch, float yaw, float roll);
+    SGL_API void GetEntityRotation(SGL_ENTITY handle, float* pitch, float* yaw, float* roll);
+    SGL_API void GetEntityLocalRotation(SGL_ENTITY handle, float* pitch, float* yaw, float* roll);
 
-    SGL_API void SetEntityScale(int handle, float sx, float sy, float sz);
-    SGL_API void GetEntityScale(int handle, float* sx, float* sy, float* sz);
-    SGL_API void GetEntityLocalScale(int handle, float* sx, float* sy, float* sz);
+    SGL_API void SetEntityScale(SGL_ENTITY handle, float sx, float sy, float sz);
+    SGL_API void GetEntityScale(SGL_ENTITY handle, float* sx, float* sy, float* sz);
+    SGL_API void GetEntityLocalScale(SGL_ENTITY handle, float* sx, float* sy, float* sz);
 
-    SGL_API int  CreateCube();
-    SGL_API int  CreateSphere();
-    SGL_API int  CreateCapsule();
-    SGL_API int  CreateCylinder();
+    SGL_API SGL_ENTITY  CreateCube();
+    SGL_API SGL_ENTITY  CreateSphere();
+    SGL_API SGL_ENTITY  CreateCapsule();
+    SGL_API SGL_ENTITY  CreateCylinder();
 
-    SGL_API void SetEntityColor(int handle, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
-    SGL_API void GetEntityColor(int handle, unsigned char* r, unsigned char* g, unsigned char* b, unsigned char* a);
+    SGL_API void SetEntityColor(SGL_ENTITY handle, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+    SGL_API void GetEntityColor(SGL_ENTITY handle, unsigned char* r, unsigned char* g, unsigned char* b, unsigned char* a);
 
-    SGL_API void SetEntityVisible(int handle, int visible);
-    SGL_API SGL_BOOL  GetEntityVisible(int handle);
+    SGL_API void SetEntityVisible(SGL_ENTITY handle, SGL_BOOL visible);
+    SGL_API SGL_BOOL  GetEntityVisible(SGL_ENTITY handle);
 
-    SGL_API void SetEntityMeshID(int handle, int meshID);
-    SGL_API int  GetEntityMeshID(int handle);
+    SGL_API void SetEntityMeshID(SGL_ENTITY handle, SGL_MESH meshID);
+    SGL_API SGL_MESH  GetEntityMeshID(SGL_ENTITY handle);
 
-    SGL_API SGL_BOOL IsEntityValid(int handle);
+    SGL_API SGL_BOOL IsEntityValid(SGL_ENTITY handle);
 
-    SGL_API void SetEntityCollide(int handle, int canCollide);
-    SGL_API SGL_BOOL  GetEntityCollide(int handle);
+    SGL_API void SetEntityCollide(SGL_ENTITY handle, SGL_BOOL canCollide);
+    SGL_API SGL_BOOL  GetEntityCollide(SGL_ENTITY handle);
 
-    SGL_API void SetEntityAnchored(int handle, int anchored);
-    SGL_API SGL_BOOL GetEntityAnchored(int handle);
+    SGL_API void SetEntityAnchored(SGL_ENTITY handle, SGL_BOOL anchored);
+    SGL_API SGL_BOOL GetEntityAnchored(SGL_ENTITY handle);
 
-    SGL_API void SetEntityAllowSleeping(int handle, int allow);
-    SGL_API SGL_BOOL GetEntityAllowSleeping(int handle);
+    SGL_API void SetEntityAllowSleeping(SGL_ENTITY handle, SGL_BOOL allow);
+    SGL_API SGL_BOOL GetEntityAllowSleeping(SGL_ENTITY handle);
 
-    SGL_API void SetEntitySensor(int handle, int sensor);
-    SGL_API SGL_BOOL GetEntitySensor(int handle);
+    SGL_API void SetEntitySensor(SGL_ENTITY handle, SGL_BOOL sensor);
+    SGL_API SGL_BOOL GetEntitySensor(SGL_ENTITY handle);
 
-    SGL_API void SetEntityFriction(int handle, float friction);
-    SGL_API float GetEntityFriction(int handle);
+    SGL_API void SetEntityFriction(SGL_ENTITY handle, float friction);
+    SGL_API float GetEntityFriction(SGL_ENTITY handle);
 
-    SGL_API void SetEntityRestitution(int handle, float restitution);
-    SGL_API float GetEntityRestitution(int handle);
+    SGL_API void SetEntityRestitution(SGL_ENTITY handle, float restitution);
+    SGL_API float GetEntityRestitution(SGL_ENTITY handle);
 
-    SGL_API void SetEntityLinearDamping(int handle, float damping);
-    SGL_API float GetEntityLinearDamping(int handle);
+    SGL_API void SetEntityLinearDamping(SGL_ENTITY handle, float damping);
+    SGL_API float GetEntityLinearDamping(SGL_ENTITY handle);
 
-    SGL_API void SetEntityAngularDamping(int handle, float damping);
-    SGL_API float GetEntityAngularDamping(int handle);
+    SGL_API void SetEntityAngularDamping(SGL_ENTITY handle, float damping);
+    SGL_API float GetEntityAngularDamping(SGL_ENTITY handle);
 
-    SGL_API void SetEntityGravityFactor(int handle, float factor);
-    SGL_API float GetEntityGravityFactor(int handle);
+    SGL_API void SetEntityGravityFactor(SGL_ENTITY handle, float factor);
+    SGL_API float GetEntityGravityFactor(SGL_ENTITY handle);
 
-    SGL_API void SetEntityMass(int handle, float mass);
-    SGL_API float GetEntityMass(int handle);
+    SGL_API void SetEntityMass(SGL_ENTITY handle, float mass);
+    SGL_API float GetEntityMass(SGL_ENTITY handle);
 
-    SGL_API void SetEntityVelocity(int handle, float vx, float vy, float vz);
-    SGL_API void GetEntityVelocity(int handle, float* vx, float* vy, float* vz);
+    SGL_API void SetEntityVelocity(SGL_ENTITY handle, float vx, float vy, float vz);
+    SGL_API void GetEntityVelocity(SGL_ENTITY handle, float* vx, float* vy, float* vz);
 
-    SGL_API void ApplyEntityImpulse(int handle, float fx, float fy, float fz);
+    SGL_API void ApplyEntityImpulse(SGL_ENTITY handle, float fx, float fy, float fz);
 
-    SGL_API void SetEntityAngularVelocity(int handle, float wx, float wy, float wz);
-    SGL_API void GetEntityAngularVelocity(int handle, float* wx, float* wy, float* wz);
+    SGL_API void SetEntityAngularVelocity(SGL_ENTITY handle, float wx, float wy, float wz);
+    SGL_API void GetEntityAngularVelocity(SGL_ENTITY handle, float* wx, float* wy, float* wz);
 
-    SGL_API void ApplyEntityAngularImpulse(int handle, float wx, float wy, float wz);
+    SGL_API void ApplyEntityAngularImpulse(SGL_ENTITY handle, float wx, float wy, float wz);
 
     SGL_API SGL_RayHit Raycast(SGL_Ray ray);
 
