@@ -1,11 +1,5 @@
 #ifdef _WIN32
 
-#ifdef _DEBUG
-#pragma comment(lib, "Jolt_Debug.lib")
-#else
-#pragma comment(lib, "Jolt_Release.lib")
-#endif
-
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "gdi32.lib")
 
@@ -42,6 +36,7 @@ namespace SGL
     {
         static constexpr JPH::ObjectLayer NON_MOVING = 0;
         static constexpr JPH::ObjectLayer MOVING = 1;
+        static constexpr JPH::ObjectLayer NO_COLLISION = 0xFFFF;
         static constexpr JPH::ObjectLayer NUM_LAYERS = 2;
     }
 
@@ -68,8 +63,23 @@ namespace SGL
 
         virtual JPH::BroadPhaseLayer GetBroadPhaseLayer(JPH::ObjectLayer layer) const override
         {
+            if (layer == ObjectLayers::NO_COLLISION)
+                return BroadPhaseLayers::MOVING;
+
             return objectToBroadPhase[layer];
         }
+
+#if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
+        virtual const char* GetBroadPhaseLayerName(JPH::BroadPhaseLayer layer) const override
+        {
+            switch ((JPH::BroadPhaseLayer::Type)layer)
+            {
+            case (JPH::BroadPhaseLayer::Type)BroadPhaseLayers::NON_MOVING: return "NON_MOVING";
+            case (JPH::BroadPhaseLayer::Type)BroadPhaseLayers::MOVING:     return "MOVING";
+            default:                                                       return "INVALID";
+            }
+        }
+#endif
 
     private:
         JPH::BroadPhaseLayer objectToBroadPhase[ObjectLayers::NUM_LAYERS];
@@ -80,8 +90,11 @@ namespace SGL
     public:
         virtual bool ShouldCollide(JPH::ObjectLayer layer1, JPH::BroadPhaseLayer layer2) const override
         {
+            if (layer1 == ObjectLayers::NO_COLLISION) return false;
+
             if (layer1 == ObjectLayers::NON_MOVING)
                 return layer2 == BroadPhaseLayers::MOVING;
+
             return true;
         }
     };
@@ -91,9 +104,22 @@ namespace SGL
     public:
         virtual bool ShouldCollide(JPH::ObjectLayer layer1, JPH::ObjectLayer layer2) const override
         {
+            if (layer1 == ObjectLayers::NO_COLLISION) return false;
+            if (layer2 == ObjectLayers::NO_COLLISION) return false;
+
             if (layer1 == ObjectLayers::NON_MOVING && layer2 == ObjectLayers::NON_MOVING)
                 return false;
+
             return true;
+        }
+    };
+
+    class RayLayerFilter : public JPH::ObjectLayerFilter
+    {
+    public:
+        virtual bool ShouldCollide(JPH::ObjectLayer layer) const override
+        {
+            return layer != ObjectLayers::NO_COLLISION;
         }
     };
 
@@ -219,8 +245,6 @@ namespace SGL
 
         if (!bodyIDs[handle].IsInvalid()) return;
 
-        if (physical.canCollide == 0) return;
-
         JPH::ShapeSettings* shapeSettings = nullptr;
 
         if (sphere)
@@ -254,12 +278,19 @@ namespace SGL
 
         if (shapeResult.HasError()) return;
 
+        JPH::ObjectLayer layer = ObjectLayers::NON_MOVING;
+
+        if (physical.canCollide == 0)
+            layer = ObjectLayers::NO_COLLISION;
+        else if (!physical.anchored)
+            layer = ObjectLayers::MOVING;
+
         JPH::BodyCreationSettings bodySettings(
             shapeResult.Get(),
             JPH::RVec3(world.position.x, world.position.y, world.position.z),
             JPH::Quat(world.rotation.x, world.rotation.y, world.rotation.z, world.rotation.w),
             physical.anchored ? JPH::EMotionType::Kinematic : JPH::EMotionType::Dynamic,
-            physical.anchored ? ObjectLayers::NON_MOVING : ObjectLayers::MOVING
+            layer
         );
 
         bodySettings.mFriction = physical.friction;
@@ -386,6 +417,102 @@ namespace SGL
         bodyInterface->SetAngularVelocity(id, JPH::Vec3::sZero());
     }
 
+    void JoltWorld::SetBodyCollide(int handle, bool collide)
+    {
+        JPH::BodyID id = GetBodyID(handle);
+
+        if (id.IsInvalid()) return;
+
+        if (!collide)
+        {
+            bodyInterface->SetObjectLayer(id, ObjectLayers::NO_COLLISION);
+        }
+        else
+        {
+            JPH::EMotionType type = bodyInterface->GetMotionType(id);
+
+            JPH::ObjectLayer layer = (type == JPH::EMotionType::Kinematic)
+                ? ObjectLayers::NON_MOVING
+                : ObjectLayers::MOVING;
+
+            bodyInterface->SetObjectLayer(id, layer);
+        }
+
+        bodyInterface->ActivateBody(id);
+    }
+
+    void JoltWorld::SetBodyAnchored(int handle, bool anchored)
+    {
+        JPH::BodyID id = GetBodyID(handle);
+
+        if (id.IsInvalid()) return;
+
+        JPH::EMotionType type = anchored ? JPH::EMotionType::Kinematic : JPH::EMotionType::Dynamic;
+
+        JPH::ObjectLayer currentLayer = bodyInterface->GetObjectLayer(id);
+
+        JPH::ObjectLayer layer = ObjectLayers::NON_MOVING;
+
+        if (currentLayer == ObjectLayers::NO_COLLISION)
+        {
+            layer = ObjectLayers::NO_COLLISION;
+        }
+        else if (!anchored)
+        {
+            layer = ObjectLayers::MOVING;
+        }
+
+        bodyInterface->SetMotionType(id, type, JPH::EActivation::Activate);
+        bodyInterface->SetObjectLayer(id, layer);
+    }
+
+    SGL_RayHit JoltWorld::Raycast(SGL_Ray ray)
+    {
+        SGL_RayHit result = {};
+        result.entity = -1;
+
+        JPH::RRayCast rayCast(
+            JPH::RVec3(ray.startX, ray.startY, ray.startZ),
+            JPH::Vec3(
+                ray.endX - ray.startX,
+                ray.endY - ray.startY,
+                ray.endZ - ray.startZ
+            )
+        );
+
+        JPH::RayCastResult hit;
+        RayLayerFilter layerFilter;
+
+        if (physicsSystem.GetNarrowPhaseQuery().CastRay(
+            rayCast,
+            hit,
+            JPH::BroadPhaseLayerFilter(),
+            layerFilter))
+        {
+            JPH::BodyID bodyID = hit.mBodyID;
+
+            for (int i = 0; i < (int)bodyIDs.size(); i++)
+            {
+                if (bodyIDs[i] == bodyID)
+                {
+                    result.hit = 1;
+                    result.entity = i;
+
+                    JPH::RVec3 point = rayCast.GetPointOnRay(hit.mFraction);
+
+                    result.pointX = (float)point.GetX();
+                    result.pointY = (float)point.GetY();
+                    result.pointZ = (float)point.GetZ();
+                    result.distance = (float)(hit.mFraction * rayCast.mDirection.Length());
+
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+
     void JoltWorld::SyncFromECS(int handle, const Transform& world)
     {
         JPH::BodyID id = GetBodyID(handle);
@@ -423,48 +550,6 @@ namespace SGL
         };
     }
 
-    SGL_RayHit JoltWorld::Raycast(SGL_Ray ray)
-    {
-        SGL_RayHit result = {};
-        result.entity = -1;
-
-        JPH::RRayCast rayCast(
-            JPH::RVec3(ray.startX, ray.startY, ray.startZ),
-            JPH::Vec3(
-                ray.endX - ray.startX,
-                ray.endY - ray.startY,
-                ray.endZ - ray.startZ
-            )
-        );
-
-        JPH::RayCastResult hit;
-
-        if (physicsSystem.GetNarrowPhaseQuery().CastRay(rayCast, hit))
-        {
-            JPH::BodyID bodyID = hit.mBodyID;
-
-            for (int i = 0; i < (int)bodyIDs.size(); i++)
-            {
-                if (bodyIDs[i] == bodyID)
-                {
-                    result.hit = 1;
-                    result.entity = i;
-
-                    JPH::RVec3 point = rayCast.GetPointOnRay(hit.mFraction);
-
-                    result.pointX = (float)point.GetX();
-                    result.pointY = (float)point.GetY();
-                    result.pointZ = (float)point.GetZ();
-                    result.distance = (float)(hit.mFraction * rayCast.mDirection.Length());
-
-                    break;
-                }
-            }
-        }
-
-        return result;
-    }
-
     void JoltWorld::Update(float deltaTime)
     {
         if (!tempAllocator || !jobSystem) return;
@@ -477,16 +562,61 @@ namespace SGL
         );
     }
 
-    void JoltWorld::SetBodyAnchored(int handle, bool anchored)
+    void JoltWorld::PhysicalUpdateWorld(float deltaTime)
     {
-        JPH::BodyID id = GetBodyID(handle);
-        if (id.IsInvalid()) return;
+        Scene& scene = GetSceneInstance();
+        JoltWorld& jolt = GetJoltWorldInstance();
 
-        JPH::EMotionType type = anchored ? JPH::EMotionType::Kinematic : JPH::EMotionType::Dynamic;
-        JPH::ObjectLayer layer = anchored ? ObjectLayers::NON_MOVING : ObjectLayers::MOVING;
+        for (int i = 0; i < scene.GetEntityCount(); i++)
+        {
+            if (!scene.IsAlive(i)) continue;
+            if (!scene.HasComponent<Physical>(i)) continue;
+            if (!scene.HasComponent<Transform>(i)) continue;
 
-        bodyInterface->SetMotionType(id, type, JPH::EActivation::Activate);
-        bodyInterface->SetObjectLayer(id, layer);
+            const Physical& physical = scene.GetComponent<Physical>(i);
+
+            if (physical.anchored)
+            {
+                jolt.SyncFromECS(i, scene.GetWorldTransform(i));
+            }
+        }
+
+        jolt.Update(deltaTime);
+
+        for (int i = 0; i < scene.GetEntityCount(); i++)
+        {
+            if (!scene.IsAlive(i)) continue;
+            if (!scene.HasComponent<Physical>(i)) continue;
+            if (!scene.HasComponent<Transform>(i)) continue;
+
+            const Physical& physical = scene.GetComponent<Physical>(i);
+
+            if (physical.anchored) continue;
+
+            Transform world = scene.GetWorldTransform(i);
+            jolt.SyncToECS(i, world);
+            scene.SetWorldTransform(i, world);
+        }
+    }
+
+    void JoltWorld::PhysicalRebuildBody(int handle)
+    {
+        Scene& scene = GetSceneInstance();
+        JoltWorld& jolt = GetJoltWorldInstance();
+
+        if (!scene.HasComponent<Physical>(handle)) return;
+
+        jolt.DestroyBody(handle);
+
+        jolt.CreateBody(
+            handle,
+            scene.GetWorldTransform(handle),
+            scene.GetComponent<Physical>(handle),
+            scene.HasComponent<OBB>(handle) ? &scene.GetComponent<OBB>(handle) : nullptr,
+            scene.HasComponent<Sphere>(handle) ? &scene.GetComponent<Sphere>(handle) : nullptr,
+            scene.HasComponent<Capsule>(handle) ? &scene.GetComponent<Capsule>(handle) : nullptr,
+            scene.HasComponent<Cylinder>(handle) ? &scene.GetComponent<Cylinder>(handle) : nullptr
+        );
     }
 
     // ====================================================================================================

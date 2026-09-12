@@ -39,13 +39,18 @@ namespace SGL
         void GetBodyAngularVelocity(int handle, float* wx, float* wy, float* wz);
         void ApplyBodyAngularImpulse(int handle, float wx, float wy, float wz);
         void TeleportBody(int handle, float x, float y, float z);
+        void SetBodyCollide(int handle, bool collide);
+        void SetBodyAnchored(int handle, bool anchored);
+
+        SGL_RayHit Raycast(SGL_Ray ray);
 
         void SyncFromECS(int handle, const Transform& world);
         void SyncToECS(int handle, Transform& world);
 
-        void SetBodyAnchored(int handle, bool anchored);
-        SGL_RayHit Raycast(SGL_Ray ray);
         void Update(float deltaTime);
+
+        void PhysicalUpdateWorld(float deltaTime);
+        void PhysicalRebuildBody(int handle);
 
     private:
         JPH::PhysicsSystem   physicsSystem;

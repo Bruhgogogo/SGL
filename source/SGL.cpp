@@ -120,47 +120,15 @@ SGL_API int GetParent(int handle)
 
 SGL_API void UpdateWorld()
 {
-    SGL::Scene& scene = SGL::GetSceneInstance();
-    SGL::JoltWorld& jolt = SGL::GetJoltWorldInstance();
-
-    for (int i = 0; i < scene.GetEntityCount(); i++)
-    {
-        if (!scene.IsAlive(i)) continue;
-        if (!scene.HasComponent<SGL::Physical>(i)) continue;
-        if (!scene.HasComponent<SGL::Transform>(i)) continue;
-
-        const SGL::Physical& physical = scene.GetComponent<SGL::Physical>(i);
-
-        if (physical.anchored)
-        {
-            jolt.SyncFromECS(i, scene.GetWorldTransform(i));
-        }
-    }
-
-    static double lastTime = ::GetTime();
-    double now = ::GetTime();
+    static double lastTime = GetElapsedTime();
+    double now = GetElapsedTime();
     float deltaTime = (float)(now - lastTime);
     lastTime = now;
 
     if (deltaTime <= 0.0f) deltaTime = 1.0f / 60.0f;
     if (deltaTime > 0.1f) deltaTime = 0.1f;
 
-    jolt.Update(deltaTime);
-
-    for (int i = 0; i < scene.GetEntityCount(); i++)
-    {
-        if (!scene.IsAlive(i)) continue;
-        if (!scene.HasComponent<SGL::Physical>(i)) continue;
-        if (!scene.HasComponent<SGL::Transform>(i)) continue;
-
-        const SGL::Physical& physical = scene.GetComponent<SGL::Physical>(i);
-
-        if (physical.anchored) continue;
-
-        SGL::Transform world = scene.GetWorldTransform(i);
-        jolt.SyncToECS(i, world);
-        scene.SetWorldTransform(i, world);
-    }
+    SGL::GetJoltWorldInstance().PhysicalUpdateWorld(deltaTime);
 }
 
 SGL_API void RenderWorld()
@@ -211,22 +179,7 @@ SGL_API void GetEntityLocalRotation(int handle, float* pitch, float* yaw, float*
 SGL_API void SetEntityScale(int handle, float sx, float sy, float sz)
 {
     SGL::GetSceneInstance().SetEntityScale(handle, sx, sy, sz);
-
-    if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return;
-
-    SGL::JoltWorld& jolt = SGL::GetJoltWorldInstance();
-    SGL::Scene& scene = SGL::GetSceneInstance();
-
-    jolt.DestroyBody(handle);
-    jolt.CreateBody(
-        handle,
-        scene.GetWorldTransform(handle),
-        scene.GetComponent<SGL::Physical>(handle),
-        scene.HasComponent<SGL::OBB>(handle) ? &scene.GetComponent<SGL::OBB>(handle) : nullptr,
-        scene.HasComponent<SGL::Sphere>(handle) ? &scene.GetComponent<SGL::Sphere>(handle) : nullptr,
-        scene.HasComponent<SGL::Capsule>(handle) ? &scene.GetComponent<SGL::Capsule>(handle) : nullptr,
-        scene.HasComponent<SGL::Cylinder>(handle) ? &scene.GetComponent<SGL::Cylinder>(handle) : nullptr
-    );
+    SGL::GetJoltWorldInstance().PhysicalRebuildBody(handle);
 }
 
 SGL_API void GetEntityScale(int handle, float* sx, float* sy, float* sz)
@@ -316,9 +269,15 @@ SGL_API SGL_BOOL IsEntityValid(int handle)
 
 SGL_API void SetEntityCollide(int handle, int canCollide)
 {
-    if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return;
+    SGL::Scene& scene = SGL::GetSceneInstance();
 
-    SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).canCollide = canCollide;
+    if (!scene.HasComponent<SGL::Physical>(handle)) return;
+
+    SGL::Physical& physical = scene.GetComponent<SGL::Physical>(handle);
+
+    physical.canCollide = canCollide;
+
+    SGL::GetJoltWorldInstance().SetBodyCollide(handle, canCollide != 0);
 }
 
 SGL_API SGL_BOOL GetEntityCollide(int handle)
@@ -330,9 +289,13 @@ SGL_API SGL_BOOL GetEntityCollide(int handle)
 
 SGL_API void SetEntityAnchored(int handle, int anchored)
 {
-    if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return;
+    SGL::Scene& scene = SGL::GetSceneInstance();
 
-    SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).anchored = anchored;
+    if (!scene.HasComponent<SGL::Physical>(handle)) return;
+
+    SGL::Physical& physical = scene.GetComponent<SGL::Physical>(handle);
+
+    physical.anchored = anchored;
 
     SGL::GetJoltWorldInstance().SetBodyAnchored(handle, anchored != 0);
 }
