@@ -80,21 +80,21 @@ SGL_API void GetCameraFOV(float* fov)
     *fov = SGL::GetCameraInstance().fov;
 }
 
-SGL_API int CreateEntity()
+SGL_API SGL_ENTITY CreateEntity()
 {
     return SGL::GetSceneInstance().CreateEntity();
 }
 
-static void DestroyEntityRecursive(int handle)
+static void DestroyEntityRecursive(SGL_ENTITY handle)
 {
     SGL::Scene& scene = SGL::GetSceneInstance();
     SGL::JoltWorld& jolt = SGL::GetJoltWorldInstance();
 
-    int c = scene.GetFirstChild(handle);
+    SGL_ENTITY c = scene.GetFirstChild(handle);
 
     while (c != SGL::INVALID_HANDLE)
     {
-        int next = scene.GetNextSibling(c);
+        SGL_ENTITY next = scene.GetNextSibling(c);
         DestroyEntityRecursive(c);
         c = next;
     }
@@ -102,18 +102,18 @@ static void DestroyEntityRecursive(int handle)
     jolt.DestroyBody(handle);
 }
 
-SGL_API void DestroyEntity(int handle)
+SGL_API void DestroyEntity(SGL_ENTITY handle)
 {
     DestroyEntityRecursive(handle);
     SGL::GetSceneInstance().DestroyEntity(handle);
 }
 
-SGL_API void SetParent(int child, int parent)
+SGL_API void SetParent(SGL_ENTITY child, SGL_ENTITY parent)
 {
     SGL::GetSceneInstance().SetParent(child, parent);
 }
 
-SGL_API int GetParent(int handle)
+SGL_API SGL_ENTITY GetParent(SGL_ENTITY handle)
 {
     return SGL::GetSceneInstance().GetParent(handle);
 }
@@ -136,7 +136,7 @@ SGL_API void RenderWorld()
     SGL::GraphicsRender();
 }
 
-SGL_API void SetEntityPosition(int handle, float x, float y, float z)
+SGL_API void SetEntityPosition(SGL_ENTITY handle, float x, float y, float z)
 {
     SGL::GetSceneInstance().SetEntityPosition(handle, x, y, z);
 
@@ -146,17 +146,17 @@ SGL_API void SetEntityPosition(int handle, float x, float y, float z)
     }
 }
 
-SGL_API void GetEntityPosition(int handle, float* x, float* y, float* z)
+SGL_API void GetEntityPosition(SGL_ENTITY handle, float* x, float* y, float* z)
 {
     SGL::GetSceneInstance().GetEntityPosition(handle, x, y, z);
 }
 
-SGL_API void GetEntityLocalPosition(int handle, float* x, float* y, float* z)
+SGL_API void GetEntityLocalPosition(SGL_ENTITY handle, float* x, float* y, float* z)
 {
     SGL::GetSceneInstance().GetEntityLocalPosition(handle, x, y, z);
 }
 
-SGL_API void SetEntityRotation(int handle, float pitch, float yaw, float roll)
+SGL_API void SetEntityRotation(SGL_ENTITY handle, float pitch, float yaw, float roll)
 {
     SGL::GetSceneInstance().SetEntityRotation(handle, pitch, yaw, roll);
 
@@ -166,53 +166,53 @@ SGL_API void SetEntityRotation(int handle, float pitch, float yaw, float roll)
     }
 }
 
-SGL_API void GetEntityRotation(int handle, float* pitch, float* yaw, float* roll)
+SGL_API void GetEntityRotation(SGL_ENTITY handle, float* pitch, float* yaw, float* roll)
 {
     SGL::GetSceneInstance().GetEntityRotation(handle, pitch, yaw, roll);
 }
 
-SGL_API void GetEntityLocalRotation(int handle, float* pitch, float* yaw, float* roll)
+SGL_API void GetEntityLocalRotation(SGL_ENTITY handle, float* pitch, float* yaw, float* roll)
 {
     SGL::GetSceneInstance().GetEntityLocalRotation(handle, pitch, yaw, roll);
 }
 
-SGL_API void SetEntityScale(int handle, float sx, float sy, float sz)
+SGL_API void SetEntityScale(SGL_ENTITY handle, float sx, float sy, float sz)
 {
     SGL::GetSceneInstance().SetEntityScale(handle, sx, sy, sz);
     SGL::GetJoltWorldInstance().PhysicalRebuildBody(handle);
 }
 
-SGL_API void GetEntityScale(int handle, float* sx, float* sy, float* sz)
+SGL_API void GetEntityScale(SGL_ENTITY handle, float* sx, float* sy, float* sz)
 {
     SGL::GetSceneInstance().GetEntityScale(handle, sx, sy, sz);
 }
 
-SGL_API void GetEntityLocalScale(int handle, float* sx, float* sy, float* sz)
+SGL_API void GetEntityLocalScale(SGL_ENTITY handle, float* sx, float* sy, float* sz)
 {
     SGL::GetSceneInstance().GetEntityLocalScale(handle, sx, sy, sz);
 }
 
-SGL_API int CreateCube()
+SGL_API SGL_ENTITY CreateCube()
 {
     return SGL::CreateCube();
 }
 
-SGL_API int CreateSphere()
+SGL_API SGL_ENTITY CreateSphere()
 {
     return SGL::CreateSphere();
 }
 
-SGL_API int CreateCapsule()
+SGL_API SGL_ENTITY CreateCapsule()
 {
     return SGL::CreateCapsule();
 }
 
-SGL_API int CreateCylinder()
+SGL_API SGL_ENTITY CreateCylinder()
 {
     return SGL::CreateCylinder();
 }
 
-SGL_API void SetEntityColor(int handle, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+SGL_API void SetEntityColor(SGL_ENTITY handle, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Color>(handle)) return;
 
@@ -224,7 +224,7 @@ SGL_API void SetEntityColor(int handle, unsigned char r, unsigned char g, unsign
     c.a = a;
 }
 
-SGL_API void GetEntityColor(int handle, unsigned char* r, unsigned char* g, unsigned char* b, unsigned char* a)
+SGL_API void GetEntityColor(SGL_ENTITY handle, unsigned char* r, unsigned char* g, unsigned char* b, unsigned char* a)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Color>(handle)) return;
 
@@ -236,38 +236,38 @@ SGL_API void GetEntityColor(int handle, unsigned char* r, unsigned char* g, unsi
     *a = c.a;
 }
 
-SGL_API void SetEntityVisible(int handle, int visible)
+SGL_API void SetEntityVisible(SGL_ENTITY handle, SGL_BOOL visible)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Visible>(handle)) return;
 
     SGL::GetSceneInstance().GetComponent<SGL::Visible>(handle).value = visible;
 }
 
-SGL_API SGL_BOOL GetEntityVisible(int handle)
+SGL_API SGL_BOOL GetEntityVisible(SGL_ENTITY handle)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Visible>(handle)) return 0;
 
     return SGL::GetSceneInstance().GetComponent<SGL::Visible>(handle).value;
 }
 
-SGL_API void SetEntityMeshID(int handle, int meshID)
+SGL_API void SetEntityMeshID(SGL_ENTITY handle, SGL_MESH meshID)
 {
     SGL::GetSceneInstance().SetEntityMeshID(handle, meshID);
 }
 
-SGL_API int GetEntityMeshID(int handle)
+SGL_API SGL_MESH GetEntityMeshID(SGL_ENTITY handle)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::MeshID>(handle)) return -1;
 
     return SGL::GetSceneInstance().GetComponent<SGL::MeshID>(handle).value;
 }
 
-SGL_API SGL_BOOL IsEntityValid(int handle)
+SGL_API SGL_BOOL IsEntityValid(SGL_ENTITY handle)
 {
     return SGL::GetSceneInstance().IsAlive(handle) ? 1 : 0;
 }
 
-SGL_API void SetEntityCollide(int handle, int canCollide)
+SGL_API void SetEntityCollide(SGL_ENTITY handle, SGL_BOOL canCollide)
 {
     SGL::Scene& scene = SGL::GetSceneInstance();
 
@@ -280,14 +280,14 @@ SGL_API void SetEntityCollide(int handle, int canCollide)
     SGL::GetJoltWorldInstance().SetBodyCollide(handle, canCollide != 0);
 }
 
-SGL_API SGL_BOOL GetEntityCollide(int handle)
+SGL_API SGL_BOOL GetEntityCollide(SGL_ENTITY handle)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return 0;
 
     return SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).canCollide;
 }
 
-SGL_API void SetEntityAnchored(int handle, int anchored)
+SGL_API void SetEntityAnchored(SGL_ENTITY handle, SGL_BOOL anchored)
 {
     SGL::Scene& scene = SGL::GetSceneInstance();
 
@@ -300,151 +300,151 @@ SGL_API void SetEntityAnchored(int handle, int anchored)
     SGL::GetJoltWorldInstance().SetBodyAnchored(handle, anchored != 0);
 }
 
-SGL_API SGL_BOOL GetEntityAnchored(int handle)
+SGL_API SGL_BOOL GetEntityAnchored(SGL_ENTITY handle)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return 0;
 
     return SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).anchored;
 }
 
-SGL_API void SetEntityAllowSleeping(int handle, int allow)
+SGL_API void SetEntityAllowSleeping(SGL_ENTITY handle, SGL_BOOL allow)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return;
 
     SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).allowSleeping = allow;
 }
 
-SGL_API SGL_BOOL GetEntityAllowSleeping(int handle)
+SGL_API SGL_BOOL GetEntityAllowSleeping(SGL_ENTITY handle)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return 0;
 
     return SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).allowSleeping;
 }
 
-SGL_API void SetEntitySensor(int handle, int sensor)
+SGL_API void SetEntitySensor(SGL_ENTITY handle, SGL_BOOL sensor)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return;
 
     SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).isSensor = sensor;
 }
 
-SGL_API SGL_BOOL GetEntitySensor(int handle)
+SGL_API SGL_BOOL GetEntitySensor(SGL_ENTITY handle)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return 0;
 
     return SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).isSensor;
 }
 
-SGL_API void SetEntityFriction(int handle, float friction)
+SGL_API void SetEntityFriction(SGL_ENTITY handle, float friction)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return;
 
     SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).friction = friction;
 }
 
-SGL_API float GetEntityFriction(int handle)
+SGL_API float GetEntityFriction(SGL_ENTITY handle)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return 0.0f;
 
     return SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).friction;
 }
 
-SGL_API void SetEntityRestitution(int handle, float restitution)
+SGL_API void SetEntityRestitution(SGL_ENTITY handle, float restitution)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return;
 
     SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).restitution = restitution;
 }
 
-SGL_API float GetEntityRestitution(int handle)
+SGL_API float GetEntityRestitution(SGL_ENTITY handle)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return 0.0f;
 
     return SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).restitution;
 }
 
-SGL_API void SetEntityLinearDamping(int handle, float damping)
+SGL_API void SetEntityLinearDamping(SGL_ENTITY handle, float damping)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return;
 
     SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).linearDamping = damping;
 }
 
-SGL_API float GetEntityLinearDamping(int handle)
+SGL_API float GetEntityLinearDamping(SGL_ENTITY handle)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return 0.0f;
 
     return SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).linearDamping;
 }
 
-SGL_API void SetEntityAngularDamping(int handle, float damping)
+SGL_API void SetEntityAngularDamping(SGL_ENTITY handle, float damping)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return;
 
     SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).angularDamping = damping;
 }
 
-SGL_API float GetEntityAngularDamping(int handle)
+SGL_API float GetEntityAngularDamping(SGL_ENTITY handle)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return 0.0f;
 
     return SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).angularDamping;
 }
 
-SGL_API void SetEntityGravityFactor(int handle, float factor)
+SGL_API void SetEntityGravityFactor(SGL_ENTITY handle, float factor)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return;
 
     SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).gravityFactor = factor;
 }
 
-SGL_API float GetEntityGravityFactor(int handle)
+SGL_API float GetEntityGravityFactor(SGL_ENTITY handle)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return 0.0f;
 
     return SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).gravityFactor;
 }
 
-SGL_API void SetEntityMass(int handle, float mass)
+SGL_API void SetEntityMass(SGL_ENTITY handle, float mass)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return;
 
     SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).mass = mass;
 }
 
-SGL_API float GetEntityMass(int handle)
+SGL_API float GetEntityMass(SGL_ENTITY handle)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Physical>(handle)) return 0.0f;
 
     return SGL::GetSceneInstance().GetComponent<SGL::Physical>(handle).mass;
 }
 
-SGL_API void SetEntityVelocity(int handle, float vx, float vy, float vz)
+SGL_API void SetEntityVelocity(SGL_ENTITY handle, float vx, float vy, float vz)
 {
     SGL::GetJoltWorldInstance().SetBodyVelocity(handle, vx, vy, vz);
 }
 
-SGL_API void GetEntityVelocity(int handle, float* vx, float* vy, float* vz)
+SGL_API void GetEntityVelocity(SGL_ENTITY handle, float* vx, float* vy, float* vz)
 {
     SGL::GetJoltWorldInstance().GetBodyVelocity(handle, vx, vy, vz);
 }
 
-SGL_API void ApplyEntityImpulse(int handle, float fx, float fy, float fz)
+SGL_API void ApplyEntityImpulse(SGL_ENTITY handle, float fx, float fy, float fz)
 {
     SGL::GetJoltWorldInstance().ApplyBodyImpulse(handle, fx, fy, fz);
 }
 
-SGL_API void SetEntityAngularVelocity(int handle, float wx, float wy, float wz)
+SGL_API void SetEntityAngularVelocity(SGL_ENTITY handle, float wx, float wy, float wz)
 {
     SGL::GetJoltWorldInstance().SetBodyAngularVelocity(handle, wx, wy, wz);
 }
 
-SGL_API void GetEntityAngularVelocity(int handle, float* wx, float* wy, float* wz)
+SGL_API void GetEntityAngularVelocity(SGL_ENTITY handle, float* wx, float* wy, float* wz)
 {
     SGL::GetJoltWorldInstance().GetBodyAngularVelocity(handle, wx, wy, wz);
 }
 
-SGL_API void ApplyEntityAngularImpulse(int handle, float wx, float wy, float wz)
+SGL_API void ApplyEntityAngularImpulse(SGL_ENTITY handle, float wx, float wy, float wz)
 {
     SGL::GetJoltWorldInstance().ApplyBodyAngularImpulse(handle, wx, wy, wz);
 }

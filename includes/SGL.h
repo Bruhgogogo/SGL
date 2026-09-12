@@ -18,9 +18,6 @@ typedef int SGL_BOOL;
 
 typedef SGL_ENTITY SGL_MESH;
 
-SGL_BOOL SGL_TRUE = 1;
-SGL_BOOL SGL_FALSE = 0;
-
 typedef enum
 {
     SGL_WINDOWED,
