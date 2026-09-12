@@ -118,7 +118,7 @@ SGL_API SGL_ENTITY GetParent(SGL_ENTITY handle)
     return SGL::GetSceneInstance().GetParent(handle);
 }
 
-SGL_API void UpdateWorld()
+SGL_API void UpdateWorld(int collisionSteps)
 {
     static double lastTime = GetElapsedTime();
     double now = GetElapsedTime();
@@ -128,7 +128,7 @@ SGL_API void UpdateWorld()
     if (deltaTime <= 0.0f) deltaTime = 1.0f / 60.0f;
     if (deltaTime > 0.1f) deltaTime = 0.1f;
 
-    SGL::GetJoltWorldInstance().PhysicalUpdateWorld(deltaTime);
+    SGL::GetJoltWorldInstance().PhysicalUpdateWorld(deltaTime, collisionSteps);
 }
 
 SGL_API void RenderWorld()

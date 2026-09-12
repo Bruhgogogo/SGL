@@ -77,7 +77,7 @@ extern "C" {
     SGL_API void SetParent(SGL_ENTITY child, SGL_ENTITY parent);
     SGL_API SGL_ENTITY  GetParent(SGL_ENTITY handle);
 
-    SGL_API void UpdateWorld();
+    SGL_API void UpdateWorld(int collisionSteps);
     SGL_API void RenderWorld();
 
     SGL_API void SetEntityPosition(SGL_ENTITY handle, float x, float y, float z);

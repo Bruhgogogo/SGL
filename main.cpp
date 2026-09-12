@@ -54,7 +54,7 @@ int main()
 
     while (!IsWindowShouldClose())
     {
-        UpdateWorld();
+        UpdateWorld(1);
         RenderWorld();
     }
 

@@ -47,9 +47,9 @@ namespace SGL
         void SyncFromECS(int handle, const Transform& world);
         void SyncToECS(int handle, Transform& world);
 
-        void Update(float deltaTime);
+        void Update(float deltaTime, int steps);
 
-        void PhysicalUpdateWorld(float deltaTime);
+        void PhysicalUpdateWorld(float deltaTime, int steps);
         void PhysicalRebuildBody(int handle);
 
     private:

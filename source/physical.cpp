@@ -550,19 +550,19 @@ namespace SGL
         };
     }
 
-    void JoltWorld::Update(float deltaTime)
+    void JoltWorld::Update(float deltaTime, int steps)
     {
         if (!tempAllocator || !jobSystem) return;
 
         physicsSystem.Update(
             deltaTime,
-            1,
+            steps,
             tempAllocator,
             jobSystem
         );
     }
 
-    void JoltWorld::PhysicalUpdateWorld(float deltaTime)
+    void JoltWorld::PhysicalUpdateWorld(float deltaTime, int steps)
     {
         Scene& scene = GetSceneInstance();
         JoltWorld& jolt = GetJoltWorldInstance();
@@ -581,7 +581,7 @@ namespace SGL
             }
         }
 
-        jolt.Update(deltaTime);
+        jolt.Update(deltaTime, steps);
 
         for (int i = 0; i < scene.GetEntityCount(); i++)
         {
