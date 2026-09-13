@@ -158,10 +158,11 @@ namespace SGL
     SGL_DECLARE_COMPONENT(Color);
     SGL_DECLARE_COMPONENT(Visible);
     SGL_DECLARE_COMPONENT(Physical);
-    SGL_DECLARE_COMPONENT(OBB);
-    SGL_DECLARE_COMPONENT(Sphere);
-    SGL_DECLARE_COMPONENT(Capsule);
-    SGL_DECLARE_COMPONENT(Cylinder);
+    SGL_DECLARE_COMPONENT(BoxShape);
+    SGL_DECLARE_COMPONENT(SphereShape);
+    SGL_DECLARE_COMPONENT(CapsuleShape);
+    SGL_DECLARE_COMPONENT(CylinderShape);
+    SGL_DECLARE_COMPONENT(AABB);
     SGL_DECLARE_COMPONENT(MeshID);
 
     // ====================================================================================================

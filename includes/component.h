@@ -42,49 +42,52 @@ namespace SGL
         float mass = 1.0f;
     };
 
-    struct OBB
+    struct BoxShape
     {
-        Vector3    localCenter = { 0, 0, 0 };
-        Vector3    localHalfExtents = { 0, 0, 0 };
-        Quaternion localRotation = QuaternionIdentity();
+        Vector3 localHalfExtents = { 0.5f, 0.5f, 0.5f };
 
-        Vector3    worldCenter = { 0, 0, 0 };
-        Vector3    worldHalfExtents = { 0, 0, 0 };
-        Quaternion worldRotation = QuaternionIdentity();
+        Vector3 worldHalfExtents = { 0.5f, 0.5f, 0.5f };
+
+        int dirty = 1;
     };
 
-    struct Sphere
+    struct SphereShape
     {
-        Vector3 localCenter = { 0, 0, 0 };
         float   localRadius = 0.5f;
 
-        Vector3 worldCenter = { 0, 0, 0 };
-        Vector3 worldRadii = { 0.5f, 0.5f, 0.5f };
-        float   worldMaxRadius = 0.5f;
+        float   worldRadius = 0.5f;
+
+        int dirty = 1;
     };
 
-    struct Capsule
+    struct CapsuleShape
     {
-        Vector3    localCenter = { 0, 0, 0 };
-        float      localRadius = 0.5f;
-        float      localHeight = 1.0f;
+        float   localRadius = 0.5f;
+        float   localHeight = 1.0f;
 
-        Vector3    worldCenter = { 0, 0, 0 };
-        float      worldRadius = 0.5f;
-        float      worldHeight = 1.0f;
-        Quaternion worldRotation = QuaternionIdentity();
+        float   worldRadius = 0.5f;
+        float   worldHeight = 1.0f;
+
+        int dirty = 1;
     };
 
-    struct Cylinder
+    struct CylinderShape
     {
-        Vector3    localCenter = { 0, 0, 0 };
-        float      localRadius = 0.5f;
-        float      localHeight = 1.0f;
+        float   localRadius = 0.5f;
+        float   localHeight = 1.0f;
 
-        Vector3    worldCenter = { 0, 0, 0 };
-        float      worldRadius = 0.5f;
-        float      worldHeight = 1.0f;
-        Quaternion worldRotation = QuaternionIdentity();
+        float   worldRadius = 0.5f;
+        float   worldHeight = 1.0f;
+
+        int dirty = 1;
+    };
+
+    struct AABB
+    {
+        Vector3 worldMin = { 0, 0, 0 };
+        Vector3 worldMax = { 0, 0, 0 };
+
+        int dirty = 1;
     };
 
     struct MeshID

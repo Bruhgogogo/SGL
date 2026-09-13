@@ -174,6 +174,82 @@ namespace SGL
         *b = SkyAmbient.z;
     }
 
+    void AABBUpdateWorld(int handle)
+    {
+        Scene& scene = GetSceneInstance();
+
+        if (!scene.HasComponent<AABB>(handle)) return;
+
+        AABB& aabb = scene.GetComponent<AABB>(handle);
+
+        if (aabb.dirty == 0) return;
+
+        const Transform& world = scene.GetWorldTransform(handle);
+
+        Vector3 localMin = { 0, 0, 0 };
+        Vector3 localMax = { 0, 0, 0 };
+
+        if (scene.HasComponent<BoxShape>(handle))
+        {
+            BoxShape& shape = scene.GetComponent<BoxShape>(handle);
+            localMin = Vector3Negate(shape.worldHalfExtents);
+            localMax = shape.worldHalfExtents;
+        }
+        else if (scene.HasComponent<SphereShape>(handle))
+        {
+            SphereShape& shape = scene.GetComponent<SphereShape>(handle);
+            localMin = { -shape.worldRadius, -shape.worldRadius, -shape.worldRadius };
+            localMax = { shape.worldRadius,  shape.worldRadius,  shape.worldRadius };
+        }
+        else if (scene.HasComponent<CapsuleShape>(handle))
+        {
+            CapsuleShape& shape = scene.GetComponent<CapsuleShape>(handle);
+            float h = shape.worldHeight * 0.5f + shape.worldRadius;
+            localMin = { -shape.worldRadius, -h, -shape.worldRadius };
+            localMax = { shape.worldRadius,  h,  shape.worldRadius };
+        }
+        else if (scene.HasComponent<CylinderShape>(handle))
+        {
+            CylinderShape& shape = scene.GetComponent<CylinderShape>(handle);
+            float h = shape.worldHeight * 0.5f;
+            localMin = { -shape.worldRadius, -h, -shape.worldRadius };
+            localMax = { shape.worldRadius,  h,  shape.worldRadius };
+        }
+
+        Vector3 corners[8] = {
+            { localMin.x, localMin.y, localMin.z },
+            { localMax.x, localMin.y, localMin.z },
+            { localMin.x, localMax.y, localMin.z },
+            { localMax.x, localMax.y, localMin.z },
+            { localMin.x, localMin.y, localMax.z },
+            { localMax.x, localMin.y, localMax.z },
+            { localMin.x, localMax.y, localMax.z },
+            { localMax.x, localMax.y, localMax.z }
+        };
+
+        Vector3 worldMin = { FLT_MAX,  FLT_MAX,  FLT_MAX };
+        Vector3 worldMax = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+
+        for (int i = 0; i < 8; i++)
+        {
+            Vector3 p = Vector3RotateByQuaternion(corners[i], world.rotation);
+            p = Vector3Add(p, world.position);
+
+            worldMin.x = fminf(worldMin.x, p.x);
+            worldMin.y = fminf(worldMin.y, p.y);
+            worldMin.z = fminf(worldMin.z, p.z);
+
+            worldMax.x = fmaxf(worldMax.x, p.x);
+            worldMax.y = fmaxf(worldMax.y, p.y);
+            worldMax.z = fmaxf(worldMax.z, p.z);
+        }
+
+        aabb.worldMin = worldMin;
+        aabb.worldMax = worldMax;
+
+        aabb.dirty = 0;
+    }
+
     void GraphicsRender()
     {
         InternalCamera& camera = GetCameraInstance();

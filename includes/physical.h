@@ -27,9 +27,7 @@ namespace SGL
         void Init();
         void Shutdown();
 
-        void CreateBody(int handle, const Transform& world, const Physical& physical,
-            const OBB* obb, const Sphere* sphere,
-            const Capsule* capsule, const Cylinder* cylinder);
+        void CreateBody(int handle, const Transform& world, const Physical& physical);
         void DestroyBody(int handle);
 
         void SetBodyVelocity(int handle, float vx, float vy, float vz);
@@ -65,13 +63,9 @@ namespace SGL
     // APIs
     // ====================================================================================================
 
-    void PhysicalComputeOBB(const Transform& world, OBB& obb);
-    void PhysicalComputeSphere(const Transform& world, Sphere& sphere);
-    void PhysicalComputeCapsule(const Transform& world, Capsule& capsule);
-    void PhysicalComputeCylinder(const Transform& world, Cylinder& cylinder);
+    void ShapeUpdateWorld(int handle, const Transform& world);
 
     SGL_RayHit PhysicalRaycast(SGL_Ray ray);
 
     JoltWorld& GetJoltWorldInstance();
-
 }

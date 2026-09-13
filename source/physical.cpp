@@ -234,9 +234,7 @@ namespace SGL
         return bodyIDs[handle];
     }
 
-    void JoltWorld::CreateBody(int handle, const Transform& world, const Physical& physical,
-        const OBB* obb, const Sphere* sphere,
-        const Capsule* capsule, const Cylinder* cylinder)
+    void JoltWorld::CreateBody(int handle, const Transform& world, const Physical& physical)
     {
         if (handle < 0) return;
 
@@ -245,30 +243,37 @@ namespace SGL
 
         if (!bodyIDs[handle].IsInvalid()) return;
 
+        Scene& scene = GetSceneInstance();
+
+        ShapeUpdateWorld(handle, world);
+
         JPH::ShapeSettings* shapeSettings = nullptr;
 
-        if (sphere)
+        if (scene.HasComponent<BoxShape>(handle))
         {
-            shapeSettings = new JPH::SphereShapeSettings(sphere->worldMaxRadius);
-        }
-        else if (capsule)
-        {
-            float halfHeight = capsule->worldHeight * 0.5f;
-            shapeSettings = new JPH::CapsuleShapeSettings(halfHeight, capsule->worldRadius);
-        }
-        else if (cylinder)
-        {
-            float halfHeight = cylinder->worldHeight * 0.5f;
-            shapeSettings = new JPH::CylinderShapeSettings(halfHeight, cylinder->worldRadius);
-        }
-        else if (obb)
-        {
+            BoxShape& shape = scene.GetComponent<BoxShape>(handle);
+
             JPH::Vec3 halfExtents(
-                obb->worldHalfExtents.x,
-                obb->worldHalfExtents.y,
-                obb->worldHalfExtents.z);
+                shape.worldHalfExtents.x,
+                shape.worldHalfExtents.y,
+                shape.worldHalfExtents.z);
 
             shapeSettings = new JPH::BoxShapeSettings(halfExtents);
+        }
+        else if (scene.HasComponent<SphereShape>(handle))
+        {
+            SphereShape& shape = scene.GetComponent<SphereShape>(handle);
+            shapeSettings = new JPH::SphereShapeSettings(shape.worldRadius);
+        }
+        else if (scene.HasComponent<CapsuleShape>(handle))
+        {
+            CapsuleShape& shape = scene.GetComponent<CapsuleShape>(handle);
+            shapeSettings = new JPH::CapsuleShapeSettings(shape.worldHeight * 0.5f, shape.worldRadius);
+        }
+        else if (scene.HasComponent<CylinderShape>(handle))
+        {
+            CylinderShape& shape = scene.GetComponent<CylinderShape>(handle);
+            shapeSettings = new JPH::CylinderShapeSettings(shape.worldHeight * 0.5f, shape.worldRadius);
         }
 
         if (!shapeSettings) return;
@@ -611,11 +616,7 @@ namespace SGL
         jolt.CreateBody(
             handle,
             scene.GetWorldTransform(handle),
-            scene.GetComponent<Physical>(handle),
-            scene.HasComponent<OBB>(handle) ? &scene.GetComponent<OBB>(handle) : nullptr,
-            scene.HasComponent<Sphere>(handle) ? &scene.GetComponent<Sphere>(handle) : nullptr,
-            scene.HasComponent<Capsule>(handle) ? &scene.GetComponent<Capsule>(handle) : nullptr,
-            scene.HasComponent<Cylinder>(handle) ? &scene.GetComponent<Cylinder>(handle) : nullptr
+            scene.GetComponent<Physical>(handle)
         );
     }
 
@@ -623,77 +624,64 @@ namespace SGL
     // APIs
     // ====================================================================================================
 
-    void PhysicalComputeOBB(const Transform& world, OBB& obb)
+    void ShapeUpdateWorld(int handle, const Transform& world)
     {
-        Vector3 scaledCenter = {
-            obb.localCenter.x * world.scale.x,
-            obb.localCenter.y * world.scale.y,
-            obb.localCenter.z * world.scale.z
-        };
+        Scene& scene = GetSceneInstance();
 
-        Vector3 rotatedCenter = Vector3RotateByQuaternion(scaledCenter, world.rotation);
-        obb.worldCenter = Vector3Add(world.position, rotatedCenter);
+        if (scene.HasComponent<BoxShape>(handle))
+        {
+            BoxShape& shape = scene.GetComponent<BoxShape>(handle);
 
-        obb.worldHalfExtents = {
-            obb.localHalfExtents.x * world.scale.x,
-            obb.localHalfExtents.y * world.scale.y,
-            obb.localHalfExtents.z * world.scale.z
-        };
+            if (shape.dirty == 0) return;
 
-        obb.worldRotation = QuaternionMultiply(world.rotation, obb.localRotation);
-    }
+            shape.worldHalfExtents = {
+                shape.localHalfExtents.x * world.scale.x,
+                shape.localHalfExtents.y * world.scale.y,
+                shape.localHalfExtents.z * world.scale.z
+            };
 
-    void PhysicalComputeSphere(const Transform& world, Sphere& sphere)
-    {
-        Vector3 scaledCenter = {
-            sphere.localCenter.x * world.scale.x,
-            sphere.localCenter.y * world.scale.y,
-            sphere.localCenter.z * world.scale.z
-        };
+            shape.dirty = 0;
+            return;
+        }
 
-        Vector3 rotatedCenter = Vector3RotateByQuaternion(scaledCenter, world.rotation);
-        sphere.worldCenter = Vector3Add(world.position, rotatedCenter);
+        if (scene.HasComponent<SphereShape>(handle))
+        {
+            SphereShape& shape = scene.GetComponent<SphereShape>(handle);
 
-        sphere.worldRadii = {
-            sphere.localRadius * world.scale.x,
-            sphere.localRadius * world.scale.y,
-            sphere.localRadius * world.scale.z
-        };
+            if (shape.dirty == 0) return;
 
-        float maxScale = fmaxf(world.scale.x, fmaxf(world.scale.y, world.scale.z));
-        sphere.worldMaxRadius = sphere.localRadius * maxScale;
-    }
+            float maxScale = fmaxf(world.scale.x, fmaxf(world.scale.y, world.scale.z));
+            shape.worldRadius = shape.localRadius * maxScale;
 
-    void PhysicalComputeCapsule(const Transform& world, Capsule& capsule)
-    {
-        Vector3 scaledCenter = {
-            capsule.localCenter.x * world.scale.x,
-            capsule.localCenter.y * world.scale.y,
-            capsule.localCenter.z * world.scale.z
-        };
+            shape.dirty = 0;
+            return;
+        }
 
-        Vector3 rotatedCenter = Vector3RotateByQuaternion(scaledCenter, world.rotation);
-        capsule.worldCenter = Vector3Add(world.position, rotatedCenter);
+        if (scene.HasComponent<CapsuleShape>(handle))
+        {
+            CapsuleShape& shape = scene.GetComponent<CapsuleShape>(handle);
 
-        capsule.worldRadius = capsule.localRadius * world.scale.x;
-        capsule.worldHeight = capsule.localHeight * world.scale.y;
-        capsule.worldRotation = world.rotation;
-    }
+            if (shape.dirty == 0) return;
 
-    void PhysicalComputeCylinder(const Transform& world, Cylinder& cylinder)
-    {
-        Vector3 scaledCenter = {
-            cylinder.localCenter.x * world.scale.x,
-            cylinder.localCenter.y * world.scale.y,
-            cylinder.localCenter.z * world.scale.z
-        };
+            shape.worldRadius = shape.localRadius * world.scale.x;
+            shape.worldHeight = shape.localHeight * world.scale.y;
 
-        Vector3 rotatedCenter = Vector3RotateByQuaternion(scaledCenter, world.rotation);
-        cylinder.worldCenter = Vector3Add(world.position, rotatedCenter);
+            shape.dirty = 0;
+            return;
+        }
 
-        cylinder.worldRadius = cylinder.localRadius * world.scale.x;
-        cylinder.worldHeight = cylinder.localHeight * world.scale.y;
-        cylinder.worldRotation = world.rotation;
+        if (scene.HasComponent<CylinderShape>(handle))
+        {
+            CylinderShape& shape = scene.GetComponent<CylinderShape>(handle);
+
+            if (shape.dirty == 0) return;
+
+            shape.worldRadius = shape.localRadius * world.scale.x;
+            shape.worldHeight = shape.localHeight * world.scale.y;
+
+            shape.dirty = 0;
+            return;
+        }
     }
 
     SGL_RayHit PhysicalRaycast(SGL_Ray ray)

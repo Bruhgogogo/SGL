@@ -27,28 +27,19 @@ namespace SGL
         meshID.value = 2;
         scene.AddComponent<MeshID>(handle, meshID);
 
-        OBB box;
-        box.localCenter = { 0, 0, 0 };
-        box.localHalfExtents = { 0.5f, 1.0f, 0.5f };
-        box.localRotation = QuaternionIdentity();
-        scene.AddComponent<OBB>(handle, box);
-
-        Capsule capsule;
-        capsule.localCenter = { 0, 0, 0 };
+        CapsuleShape capsule;
         capsule.localRadius = 0.5f;
         capsule.localHeight = 1.0f;
-        scene.AddComponent<Capsule>(handle, capsule);
+        scene.AddComponent<CapsuleShape>(handle, capsule);
+
+        scene.AddComponent<AABB>(handle, AABB());
 
         scene.UpdateEntityTree(handle);
 
         GetJoltWorldInstance().CreateBody(
             handle,
             scene.GetWorldTransform(handle),
-            scene.GetComponent<Physical>(handle),
-            nullptr,
-            nullptr,
-            &scene.GetComponent<Capsule>(handle),
-            nullptr
+            scene.GetComponent<Physical>(handle)
         );
 
         return handle;

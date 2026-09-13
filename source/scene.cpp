@@ -400,7 +400,7 @@ namespace SGL
             else
                 worlds[handle] = local;
 
-            if (HasComponent<Capsule>(handle) || HasComponent<Cylinder>(handle))
+            if (HasComponent<CapsuleShape>(handle) || HasComponent<CylinderShape>(handle))
             {
                 float maxRadial = fmaxf(worlds[handle].scale.x, worlds[handle].scale.z);
                 worlds[handle].scale.x = maxRadial;
@@ -409,28 +409,11 @@ namespace SGL
 
             worlds[handle].matrixDirty = 1;
 
-            if (HasComponent<OBB>(handle))
-            {
-                OBB& obb = GetComponent<OBB>(handle);
-                PhysicalComputeOBB(worlds[handle], obb);
-            }
+            ShapeUpdateWorld(handle, worlds[handle]);
 
-            if (HasComponent<Sphere>(handle))
+            if (HasComponent<AABB>(handle))
             {
-                Sphere& sphere = GetComponent<Sphere>(handle);
-                PhysicalComputeSphere(worlds[handle], sphere);
-            }
-
-            if (HasComponent<Capsule>(handle))
-            {
-                Capsule& capsule = GetComponent<Capsule>(handle);
-                PhysicalComputeCapsule(worlds[handle], capsule);
-            }
-
-            if (HasComponent<Cylinder>(handle))
-            {
-                Cylinder& cylinder = GetComponent<Cylinder>(handle);
-                PhysicalComputeCylinder(worlds[handle], cylinder);
+                GetComponent<AABB>(handle).dirty = 1;
             }
         }
 
@@ -538,6 +521,12 @@ namespace SGL
         if (!HasComponent<Transform>(handle)) return;
 
         GetComponent<Transform>(handle).scale = { sx, sy, sz };
+
+        if (HasComponent<BoxShape>(handle))      GetComponent<BoxShape>(handle).dirty = 1;
+        if (HasComponent<SphereShape>(handle))   GetComponent<SphereShape>(handle).dirty = 1;
+        if (HasComponent<CapsuleShape>(handle))  GetComponent<CapsuleShape>(handle).dirty = 1;
+        if (HasComponent<CylinderShape>(handle)) GetComponent<CylinderShape>(handle).dirty = 1;
+
         UpdateEntityTree(handle);
     }
 
@@ -624,6 +613,11 @@ namespace SGL
 
         worlds[handle] = world;
 
+        if (HasComponent<AABB>(handle))
+        {
+            GetComponent<AABB>(handle).dirty = 1;
+        }
+
         if (HasComponent<Transform>(handle))
         {
             Transform parentWorld = IdentityTransform();
@@ -657,9 +651,10 @@ namespace SGL
     SGL_INSTANTIATE_COMPONENT(Color);
     SGL_INSTANTIATE_COMPONENT(Visible);
     SGL_INSTANTIATE_COMPONENT(Physical);
-    SGL_INSTANTIATE_COMPONENT(OBB);
-    SGL_INSTANTIATE_COMPONENT(Sphere);
-    SGL_INSTANTIATE_COMPONENT(Capsule);
-    SGL_INSTANTIATE_COMPONENT(Cylinder);
+    SGL_INSTANTIATE_COMPONENT(BoxShape);
+    SGL_INSTANTIATE_COMPONENT(SphereShape);
+    SGL_INSTANTIATE_COMPONENT(CapsuleShape);
+    SGL_INSTANTIATE_COMPONENT(CylinderShape);
+    SGL_INSTANTIATE_COMPONENT(AABB);
     SGL_INSTANTIATE_COMPONENT(MeshID);
 }

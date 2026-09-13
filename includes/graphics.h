@@ -27,6 +27,8 @@ namespace SGL
     void GraphicsSetSkyAmbient(float r, float g, float b);
     void GraphicsGetSkyAmbient(float* r, float* g, float* b);
 
+    void AABBUpdateWorld(int handle);
+
     void GraphicsRender();
 
 }
