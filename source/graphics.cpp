@@ -89,6 +89,7 @@ namespace SGL
     void GraphicsInit(int width, int height, const char* title)
     {
         InitWindow(width, height, title);
+        rlEnableBackfaceCulling();
     }
 
     bool GraphicsShouldClose()

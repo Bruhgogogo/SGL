@@ -144,6 +144,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="source\attachment.cpp" />
     <ClCompile Include="third_party\Jolt\AABBTree\AABBTreeBuilder.cpp" />
     <ClCompile Include="third_party\Jolt\Core\Color.cpp" />
     <ClCompile Include="third_party\Jolt\Core\Factory.cpp" />
@@ -289,6 +290,7 @@
     <ClCompile Include="source\sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="includes\attachment.h" />
     <ClInclude Include="includes\capsule.h" />
     <ClInclude Include="includes\component.h" />
     <ClInclude Include="includes\cube.h" />

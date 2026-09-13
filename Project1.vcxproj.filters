@@ -459,6 +459,9 @@
     <ClCompile Include="third_party\Jolt\ObjectStream\TypeDeclarations.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\attachment.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\SGL.h">
@@ -1400,6 +1403,21 @@
     <ClInclude Include="third_party\Jolt\ObjectStream\GetPrimitiveTypeOfType.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="third_party\Raylib\raylib.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\Raylib\raymath.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\Raylib\rcamera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\Raylib\rlgl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\attachment.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="third_party\Jolt\Jolt.cmake" />
@@ -1449,5 +1467,9 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="third_party\Jolt\Jolt.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="libs\Raylib_Debug.lib" />
+    <Library Include="libs\Raylib_Release.lib" />
   </ItemGroup>
 </Project>

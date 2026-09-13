@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Raylib/raylib.h>
-#include <Raylib/raymath.h>
+#include "Raylib/raylib.h"
+#include "Raylib/raymath.h"
+#include "Raylib/rlgl.h"
 
 #ifdef _WIN32
 

@@ -4,12 +4,19 @@
 
 using namespace std;
 
+constexpr float deg2rad = 3.14159265358979323846f / 180.0f;
+
+static float DegToRad(float deg)
+{
+    return deg * deg2rad;
+}
+
 int main()
 {
     Graphics3D(800, 600, "SGL Jolt Physics Test");
 
     SetCameraPosition(0.0f, 8.0f, 16.0f);
-    SetCameraRotation(-25.0f, 0.0f, 0.0f);
+    SetCameraRotation(DegToRad(-25.0f), 0.0f, 0.0f);
 
     int ground = CreateCube();
     SetEntityPosition(ground, 0.0f, -1.0f, 0.0f);
@@ -18,7 +25,7 @@ int main()
 
     int ramp = CreateCube();
     SetEntityPosition(ramp, 4.0f, 1.0f, 0.0f);
-    SetEntityRotation(ramp, 0.0f, 0.0f, -30.0f);
+    SetEntityRotation(ramp, 0.0f, 0.0f, DegToRad(-30.0f));
     SetEntityScale(ramp, 4.0f, 0.5f, 4.0f);
     SetEntityColor(ramp, 120, 120, 120, 255);
 
