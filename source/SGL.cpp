@@ -109,14 +109,24 @@ SGL_API void RenderWorld()
     SGL::GraphicsRender();
 }
 
-SGL_API void SetAmbientColor(float r, float g, float b, float intensity)
+SGL_API void SetGroundAmbient(float r, float g, float b)
 {
-    SGL::GraphicsSetAmbientColor(r, g, b, intensity);
+    SGL::GraphicsSetGroundAmbient(r, g, b);
 }
 
-SGL_API void GetAmbientColor(float* r, float* g, float* b, float* intensity)
+SGL_API void GetGroundAmbient(float* r, float* g, float* b)
 {
-    SGL::GraphicsGetAmbientColor(r, g, b, intensity);
+    SGL::GraphicsGetGroundAmbient(r, g, b);
+}
+
+SGL_API void SetSkyAmbient(float r, float g, float b)
+{
+    SGL::GraphicsSetSkyAmbient(r, g, b);
+}
+
+SGL_API void GetSkyAmbient(float* r, float* g, float* b)
+{
+    SGL::GraphicsGetSkyAmbient(r, g, b);
 }
 
 SGL_API SGL_ENTITY CreateEntity()

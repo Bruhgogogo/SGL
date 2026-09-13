@@ -40,11 +40,13 @@ namespace SGL
 
         float halfHeight = height * 0.5f;
 
-        float ringStep = PI / (float)rings;
+        float ringStep = (PI * 0.5f) / (float)rings;
         float sliceStep = 2.0f * PI / (float)slices;
 
-        int ringCount = rings + 1;
         int sliceCount = slices + 1;
+        int hemiRingCount = rings + 1;
+
+        int cylinderBase = (int)(vertices.size() / 3);
 
         for (int r = 0; r <= 1; r++)
         {
@@ -71,10 +73,10 @@ namespace SGL
 
         for (int s = 0; s < slices; s++)
         {
-            int i0 = s;
-            int i1 = s + 1;
-            int i2 = s + sliceCount;
-            int i3 = s + sliceCount + 1;
+            int i0 = cylinderBase + s;
+            int i1 = cylinderBase + s + 1;
+            int i2 = cylinderBase + sliceCount + s;
+            int i3 = cylinderBase + sliceCount + s + 1;
 
             indices.push_back(i0);
             indices.push_back(i2);
@@ -90,8 +92,8 @@ namespace SGL
         for (int r = 0; r <= rings; r++)
         {
             float phi = r * ringStep;
-            float y = cosf(phi) * radius;
-            float rxz = sinf(phi) * radius;
+            float y = sinf(phi) * radius;
+            float rxz = cosf(phi) * radius;
 
             for (int s = 0; s <= slices; s++)
             {
@@ -103,12 +105,9 @@ namespace SGL
                 vertices.push_back(y + halfHeight);
                 vertices.push_back(z);
 
-                Vector3 n = { cosf(angle) * sinf(phi), cosf(phi), sinf(angle) * sinf(phi) };
-                n = Vector3Normalize(n);
-
-                normals.push_back(n.x);
-                normals.push_back(n.y);
-                normals.push_back(n.z);
+                normals.push_back(cosf(angle) * cosf(phi));
+                normals.push_back(sinf(phi));
+                normals.push_back(sinf(angle) * cosf(phi));
 
                 texcoords.push_back((float)s / (float)slices);
                 texcoords.push_back((float)r / (float)rings);
@@ -139,8 +138,8 @@ namespace SGL
         for (int r = 0; r <= rings; r++)
         {
             float phi = r * ringStep;
-            float y = -cosf(phi) * radius;
-            float rxz = sinf(phi) * radius;
+            float y = -sinf(phi) * radius;
+            float rxz = cosf(phi) * radius;
 
             for (int s = 0; s <= slices; s++)
             {
@@ -152,12 +151,9 @@ namespace SGL
                 vertices.push_back(y - halfHeight);
                 vertices.push_back(z);
 
-                Vector3 n = { cosf(angle) * sinf(phi), -cosf(phi), sinf(angle) * sinf(phi) };
-                n = Vector3Normalize(n);
-
-                normals.push_back(n.x);
-                normals.push_back(n.y);
-                normals.push_back(n.z);
+                normals.push_back(cosf(angle) * cosf(phi));
+                normals.push_back(-sinf(phi));
+                normals.push_back(sinf(angle) * cosf(phi));
 
                 texcoords.push_back((float)s / (float)slices);
                 texcoords.push_back((float)r / (float)rings);
@@ -174,12 +170,12 @@ namespace SGL
                 int i3 = i2 + 1;
 
                 indices.push_back(i0);
-                indices.push_back(i2);
                 indices.push_back(i1);
+                indices.push_back(i2);
 
                 indices.push_back(i1);
-                indices.push_back(i2);
                 indices.push_back(i3);
+                indices.push_back(i2);
             }
         }
 

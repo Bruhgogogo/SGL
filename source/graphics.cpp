@@ -21,9 +21,10 @@ namespace SGL
     static Shader StandardShader = {};
     static bool StandardShaderLoaded = false;
 
-    static Vector3 AmbientColor = { 1.0f, 1.0f, 1.0f };
-    static float   AmbientIntensity = 0.1f;
-    static int     AmbientColorLoc = -1;
+    static Vector3 GroundAmbient = { 0.2f, 0.15f, 0.1f };
+    static Vector3 SkyAmbient = { 0.5f, 0.6f, 0.8f };
+    static int     GroundAmbientLoc = -1;
+    static int     SkyAmbientLoc = -1;
 
     // ====================================================================================================
     // UTILS
@@ -83,10 +84,11 @@ namespace SGL
     {
         InitWindow(width, height, title);
 
-        StandardShader = LoadShader("shaders/standard.vs", "shaders/standard.fs");
+        StandardShader = LoadShader("shaders/standard.vert", "shaders/standard.frag");
         StandardShaderLoaded = (StandardShader.id != 0);
 
-        AmbientColorLoc = GetShaderLocation(StandardShader, "ambientColor");
+        GroundAmbientLoc = GetShaderLocation(StandardShader, "groundAmbient");
+        SkyAmbientLoc = GetShaderLocation(StandardShader, "skyAmbient");
 
         EnsureCubeModel();
         EnsureSphereModel();
@@ -148,18 +150,28 @@ namespace SGL
             *mode = 0;
     }
 
-    void GraphicsSetAmbientColor(float r, float g, float b, float intensity)
+    void GraphicsSetGroundAmbient(float r, float g, float b)
     {
-        AmbientColor = { r, g, b };
-        AmbientIntensity = intensity;
+        GroundAmbient = { r, g, b };
     }
 
-    void GraphicsGetAmbientColor(float* r, float* g, float* b, float* intensity)
+    void GraphicsGetGroundAmbient(float* r, float* g, float* b)
     {
-        *r = AmbientColor.x;
-        *g = AmbientColor.y;
-        *b = AmbientColor.z;
-        *intensity = AmbientIntensity;
+        *r = GroundAmbient.x;
+        *g = GroundAmbient.y;
+        *b = GroundAmbient.z;
+    }
+
+    void GraphicsSetSkyAmbient(float r, float g, float b)
+    {
+        SkyAmbient = { r, g, b };
+    }
+
+    void GraphicsGetSkyAmbient(float* r, float* g, float* b)
+    {
+        *r = SkyAmbient.x;
+        *g = SkyAmbient.y;
+        *b = SkyAmbient.z;
     }
 
     void GraphicsRender()
@@ -170,19 +182,14 @@ namespace SGL
         Scene& scene = GetSceneInstance();
         scene.CollectRenderList();
 
-        Vector3 ambient = {
-            AmbientColor.x * AmbientIntensity,
-            AmbientColor.y * AmbientIntensity,
-            AmbientColor.z * AmbientIntensity
-        };
-
         BeginDrawing();
 
         ClearBackground({ 0, 0, 0, 255 });
 
         BeginMode3D(camera.raylibCamera);
 
-        SetShaderValue(StandardShader, AmbientColorLoc, &ambient, SHADER_UNIFORM_VEC3);
+        SetShaderValue(StandardShader, GroundAmbientLoc, &GroundAmbient, SHADER_UNIFORM_VEC3);
+        SetShaderValue(StandardShader, SkyAmbientLoc, &SkyAmbient, SHADER_UNIFORM_VEC3);
 
         const std::vector<RenderItem>& list = scene.GetRenderList();
 

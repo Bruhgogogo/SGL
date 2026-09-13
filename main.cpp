@@ -18,7 +18,8 @@ int main()
     SetCameraPosition(0.0f, 8.0f, 16.0f);
     SetCameraRotation(DegToRad(-25.0f), 0.0f, 0.0f);
 
-    SetAmbientColor(0.6f, 0.6f, 0.65f, 0.4f);
+    SetGroundAmbient(0.2f, 0.15f, 0.1f);
+    SetSkyAmbient(0.5f, 0.6f, 0.8f);
      
     int ground = CreateCube();
     SetEntityPosition(ground, 0.0f, -1.0f, 0.0f);

@@ -22,8 +22,10 @@ namespace SGL
     void GraphicsSetWindowHeight(int height);
     void GraphicsGetWindowMode(int* mode);
 
-    void GraphicsSetAmbientColor(float r, float g, float b, float intensity);
-    void GraphicsGetAmbientColor(float* r, float* g, float* b, float* intensity);
+    void GraphicsSetGroundAmbient(float r, float g, float b);
+    void GraphicsGetGroundAmbient(float* r, float* g, float* b);
+    void GraphicsSetSkyAmbient(float r, float g, float b);
+    void GraphicsGetSkyAmbient(float* r, float* g, float* b);
 
     void GraphicsRender();
 
