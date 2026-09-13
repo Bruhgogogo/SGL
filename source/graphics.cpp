@@ -1,6 +1,7 @@
 #include "graphics.h"
 #include "scene.h"
 #include "camera.h"
+#include <iostream>
 
 // ====================================================================================================
 // NAMESPACE
@@ -13,16 +14,16 @@ namespace SGL
     // ====================================================================================================
 
     static Model CubeModel = {};
-    static bool CubeModelLoaded = false;
-
     static Model SphereModel = {};
-    static bool SphereModelLoaded = false;
-
     static Model CapsuleModel = {};
-    static bool CapsuleModelLoaded = false;
-
     static Model CylinderModel = {};
-    static bool CylinderModelLoaded = false;
+
+    static Shader StandardShader = {};
+    static bool StandardShaderLoaded = false;
+
+    static Vector3 AmbientColor = { 1.0f, 1.0f, 1.0f };
+    static float   AmbientIntensity = 0.1f;
+    static int     AmbientColorLoc = -1;
 
     // ====================================================================================================
     // UTILS
@@ -30,38 +31,30 @@ namespace SGL
 
     static void EnsureCubeModel()
     {
-        if (CubeModelLoaded) return;
-
         Mesh mesh = GenMeshCube(1.0f, 1.0f, 1.0f);
         CubeModel = LoadModelFromMesh(mesh);
-        CubeModelLoaded = true;
+        CubeModel.materials[0].shader = StandardShader;
     }
 
     static void EnsureSphereModel()
     {
-        if (SphereModelLoaded) return;
-
         Mesh mesh = GenMeshSphere(0.5f, 16, 16);
         SphereModel = LoadModelFromMesh(mesh);
-        SphereModelLoaded = true;
+        SphereModel.materials[0].shader = StandardShader;
     }
 
     static void EnsureCapsuleModel()
     {
-        if (CapsuleModelLoaded) return;
-
         Mesh mesh = GenMeshCapsule(0.5f, 1.0f, 16, 16);
         CapsuleModel = LoadModelFromMesh(mesh);
-        CapsuleModelLoaded = true;
+        CapsuleModel.materials[0].shader = StandardShader;
     }
 
     static void EnsureCylinderModel()
     {
-        if (CylinderModelLoaded) return;
-
         Mesh mesh = GenMeshCylinder(0.5f, 1.0f, 16);
         CylinderModel = LoadModelFromMesh(mesh);
-        CylinderModelLoaded = true;
+        CylinderModel.materials[0].shader = StandardShader;
     }
 
     static Matrix MakeTransformMatrix(const Transform& t)
@@ -89,7 +82,25 @@ namespace SGL
     void GraphicsInit(int width, int height, const char* title)
     {
         InitWindow(width, height, title);
-        rlEnableBackfaceCulling();
+
+        StandardShader = LoadShader("shaders/standard.vs", "shaders/standard.fs");
+        StandardShaderLoaded = (StandardShader.id != 0);
+
+        AmbientColorLoc = GetShaderLocation(StandardShader, "ambientColor");
+
+        EnsureCubeModel();
+        EnsureSphereModel();
+        EnsureCapsuleModel();
+        EnsureCylinderModel();
+    }
+
+    void GraphicsShutdown()
+    {
+        if (StandardShaderLoaded)
+        {
+            UnloadShader(StandardShader);
+            StandardShaderLoaded = false;
+        }
     }
 
     bool GraphicsShouldClose()
@@ -137,24 +148,41 @@ namespace SGL
             *mode = 0;
     }
 
+    void GraphicsSetAmbientColor(float r, float g, float b, float intensity)
+    {
+        AmbientColor = { r, g, b };
+        AmbientIntensity = intensity;
+    }
+
+    void GraphicsGetAmbientColor(float* r, float* g, float* b, float* intensity)
+    {
+        *r = AmbientColor.x;
+        *g = AmbientColor.y;
+        *b = AmbientColor.z;
+        *intensity = AmbientIntensity;
+    }
+
     void GraphicsRender()
     {
-        EnsureCubeModel();
-        EnsureSphereModel();
-        EnsureCapsuleModel();
-        EnsureCylinderModel();
-
         InternalCamera& camera = GetCameraInstance();
         camera.UpdateCamera();
 
         Scene& scene = GetSceneInstance();
         scene.CollectRenderList();
 
+        Vector3 ambient = {
+            AmbientColor.x * AmbientIntensity,
+            AmbientColor.y * AmbientIntensity,
+            AmbientColor.z * AmbientIntensity
+        };
+
         BeginDrawing();
 
         ClearBackground({ 0, 0, 0, 255 });
 
         BeginMode3D(camera.raylibCamera);
+
+        SetShaderValue(StandardShader, AmbientColorLoc, &ambient, SHADER_UNIFORM_VEC3);
 
         const std::vector<RenderItem>& list = scene.GetRenderList();
 

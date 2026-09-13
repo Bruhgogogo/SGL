@@ -14,6 +14,19 @@ namespace SGL
         return Vector3RotateByQuaternion({ 0.0f, 1.0f, 0.0f }, orientation);
     }
 
+    void InternalCamera::SetNearFarPlane(float near, float far)
+    {
+        nearPlane = near;
+        farPlane = far;
+        rlSetClipPlanes(near, far);
+    }
+
+    void InternalCamera::GetNearFarPlane(float* near, float* far)
+    {
+        *near = nearPlane;
+        *far = farPlane;
+    }
+
     void InternalCamera::SetRotationEuler(Vector3 deg)
     {
         float qx, qy, qz, qw;

@@ -1464,6 +1464,8 @@
     <None Include="third_party\Jolt\Core\Profiler.inl">
       <Filter>头文件</Filter>
     </None>
+    <None Include="shaders\standard.fs" />
+    <None Include="shaders\standard.vs" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="third_party\Jolt\Jolt.natvis" />

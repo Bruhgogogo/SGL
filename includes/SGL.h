@@ -70,15 +70,20 @@ extern "C" {
     SGL_API void GetCameraRotation(float* pitch, float* yaw, float* roll);
     SGL_API void SetCameraFOV(float fov);
     SGL_API void GetCameraFOV(float* fov);
+    SGL_API void SetCameraNearFarPlane(float nearPlane, float farPlane);
+    SGL_API void GetCameraNearFarPlane(float* nearPlane, float* farPlane);
+
+    SGL_API void UpdateWorld(int collisionSteps);
+    SGL_API void RenderWorld();
+
+    SGL_API void SetAmbientColor(float r, float g, float b, float intensity);
+    SGL_API void GetAmbientColor(float* r, float* g, float* b, float* intensity);
 
     SGL_API SGL_ENTITY  CreateEntity();
     SGL_API void DestroyEntity(SGL_ENTITY handle);
 
     SGL_API void SetParent(SGL_ENTITY child, SGL_ENTITY parent);
     SGL_API SGL_ENTITY  GetParent(SGL_ENTITY handle);
-
-    SGL_API void UpdateWorld(int collisionSteps);
-    SGL_API void RenderWorld();
 
     SGL_API void SetEntityPosition(SGL_ENTITY handle, float x, float y, float z);
     SGL_API void GetEntityPosition(SGL_ENTITY handle, float* x, float* y, float* z);

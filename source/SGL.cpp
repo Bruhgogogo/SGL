@@ -19,6 +19,7 @@ SGL_API void Graphics3D(int width, int height, const char* title)
 
 SGL_API void ShutdownSGL()
 {
+    SGL::GraphicsShutdown();
     SGL::GetJoltWorldInstance().Shutdown();
 }
 
@@ -80,6 +81,44 @@ SGL_API void GetCameraFOV(float* fov)
     *fov = SGL::GetCameraInstance().fov;
 }
 
+SGL_API void SetCameraNearFarPlane(float nearPlane, float farPlane)
+{
+    SGL::GetCameraInstance().SetNearFarPlane(nearPlane, farPlane);
+}
+
+SGL_API void GetCameraNearFarPlane(float* nearPlane, float* farPlane)
+{
+    SGL::GetCameraInstance().GetNearFarPlane(nearPlane, farPlane);
+}
+
+SGL_API void UpdateWorld(int collisionSteps)
+{
+    static double lastTime = GetElapsedTime();
+    double now = GetElapsedTime();
+    float deltaTime = (float)(now - lastTime);
+    lastTime = now;
+
+    if (deltaTime <= 0.0f) deltaTime = 1.0f / 60.0f;
+    if (deltaTime > 0.1f) deltaTime = 0.1f;
+
+    SGL::GetJoltWorldInstance().PhysicalUpdateWorld(deltaTime, collisionSteps);
+}
+
+SGL_API void RenderWorld()
+{
+    SGL::GraphicsRender();
+}
+
+SGL_API void SetAmbientColor(float r, float g, float b, float intensity)
+{
+    SGL::GraphicsSetAmbientColor(r, g, b, intensity);
+}
+
+SGL_API void GetAmbientColor(float* r, float* g, float* b, float* intensity)
+{
+    SGL::GraphicsGetAmbientColor(r, g, b, intensity);
+}
+
 SGL_API SGL_ENTITY CreateEntity()
 {
     return SGL::GetSceneInstance().CreateEntity();
@@ -116,24 +155,6 @@ SGL_API void SetParent(SGL_ENTITY child, SGL_ENTITY parent)
 SGL_API SGL_ENTITY GetParent(SGL_ENTITY handle)
 {
     return SGL::GetSceneInstance().GetParent(handle);
-}
-
-SGL_API void UpdateWorld(int collisionSteps)
-{
-    static double lastTime = GetElapsedTime();
-    double now = GetElapsedTime();
-    float deltaTime = (float)(now - lastTime);
-    lastTime = now;
-
-    if (deltaTime <= 0.0f) deltaTime = 1.0f / 60.0f;
-    if (deltaTime > 0.1f) deltaTime = 0.1f;
-
-    SGL::GetJoltWorldInstance().PhysicalUpdateWorld(deltaTime, collisionSteps);
-}
-
-SGL_API void RenderWorld()
-{
-    SGL::GraphicsRender();
 }
 
 SGL_API void SetEntityPosition(SGL_ENTITY handle, float x, float y, float z)

@@ -13,6 +13,7 @@ namespace SGL
     // ====================================================================================================
 
     void GraphicsInit(int width, int height, const char* title);
+    void GraphicsShutdown();
     bool GraphicsShouldClose();
     void GraphicsGetWindowWidth(int* width);
     void GraphicsGetWindowHeight(int* height);
@@ -20,6 +21,10 @@ namespace SGL
     void GraphicsSetWindowWidth(int width);
     void GraphicsSetWindowHeight(int height);
     void GraphicsGetWindowMode(int* mode);
+
+    void GraphicsSetAmbientColor(float r, float g, float b, float intensity);
+    void GraphicsGetAmbientColor(float* r, float* g, float* b, float* intensity);
+
     void GraphicsRender();
 
 }

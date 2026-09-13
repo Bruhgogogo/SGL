@@ -14,6 +14,9 @@ namespace SGL
         Vector3 position = { 0, 0, 0 };
         Quaternion orientation = QuaternionIdentity();
 
+        float nearPlane = 0.01f;
+        float farPlane = 1000.0f;
+
         Vector3 GetForward() const;
         Vector3 GetUp() const;
 
@@ -22,6 +25,9 @@ namespace SGL
 
         void SetPosition(float x, float y, float z);
         Vector3 GetPosition() const;
+
+        void SetNearFarPlane(float near, float far);
+        void GetNearFarPlane(float* near, float* far);
 
         void UpdateCamera();
     };
