@@ -7,6 +7,7 @@
 #include "sphere.h"
 #include "capsule.h"
 #include "cylinder.h"
+#include "directionalLight.h"
 #include "raylibUtils.h"
 #include "mathUtils.h"
 #include "physical.h"
@@ -243,6 +244,11 @@ SGL_API SGL_ENTITY CreateCylinder()
     return SGL::CreateCylinder();
 }
 
+SGL_API SGL_ENTITY CreateDirectionalLight()
+{
+    return SGL::CreateDirectionalLight();
+}
+
 SGL_API void SetEntityColor(SGL_ENTITY handle, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Color>(handle)) return;
@@ -291,6 +297,48 @@ SGL_API SGL_MESH GetEntityMeshID(SGL_ENTITY handle)
     if (!SGL::GetSceneInstance().HasComponent<SGL::MeshID>(handle)) return -1;
 
     return SGL::GetSceneInstance().GetComponent<SGL::MeshID>(handle).value;
+}
+
+SGL_API void SetLightIntensity(SGL_ENTITY handle, float intensity)
+{
+    if (!SGL::GetSceneInstance().HasComponent<SGL::DirectionalLight>(handle)) return;
+
+    SGL::GetSceneInstance().GetComponent<SGL::DirectionalLight>(handle).intensity = intensity;
+}
+
+SGL_API float GetLightIntensity(SGL_ENTITY handle)
+{
+    if (!SGL::GetSceneInstance().HasComponent<SGL::DirectionalLight>(handle)) return 0.0f;
+
+    return SGL::GetSceneInstance().GetComponent<SGL::DirectionalLight>(handle).intensity;
+}
+
+SGL_API void SetLightShadow(SGL_ENTITY handle, SGL_BOOL shadow)
+{
+    if (!SGL::GetSceneInstance().HasComponent<SGL::DirectionalLight>(handle)) return;
+
+    SGL::GetSceneInstance().GetComponent<SGL::DirectionalLight>(handle).shadow = shadow;
+}
+
+SGL_API SGL_BOOL GetLightShadow(SGL_ENTITY handle)
+{
+    if (!SGL::GetSceneInstance().HasComponent<SGL::DirectionalLight>(handle)) return 0;
+
+    return SGL::GetSceneInstance().GetComponent<SGL::DirectionalLight>(handle).shadow;
+}
+
+SGL_API void SetLightSpecular(SGL_ENTITY handle, SGL_BOOL specular)
+{
+    if (!SGL::GetSceneInstance().HasComponent<SGL::DirectionalLight>(handle)) return;
+
+    SGL::GetSceneInstance().GetComponent<SGL::DirectionalLight>(handle).specular = specular;
+}
+
+SGL_API SGL_BOOL GetLightSpecular(SGL_ENTITY handle)
+{
+    if (!SGL::GetSceneInstance().HasComponent<SGL::DirectionalLight>(handle)) return 0;
+
+    return SGL::GetSceneInstance().GetComponent<SGL::DirectionalLight>(handle).specular;
 }
 
 SGL_API SGL_BOOL IsEntityValid(SGL_ENTITY handle)
@@ -483,6 +531,16 @@ SGL_API void ApplyEntityAngularImpulse(SGL_ENTITY handle, float wx, float wy, fl
 SGL_API SGL_RayHit Raycast(SGL_Ray ray)
 {
     return SGL::PhysicalRaycast(ray);
+}
+
+SGL_API void SetGravity(float x, float y, float z)
+{
+    SGL::GetJoltWorldInstance().SetGravity(x, y, z);
+}
+
+SGL_API void GetGravity(float* x, float* y, float* z)
+{
+    SGL::GetJoltWorldInstance().GetGravity(x, y, z);
 }
 
 SGL_API double GetElapsedTime()

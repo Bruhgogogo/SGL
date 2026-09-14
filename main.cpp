@@ -20,6 +20,11 @@ int main()
 
     SetGroundAmbient(0.2f, 0.15f, 0.1f);
     SetSkyAmbient(0.5f, 0.6f, 0.8f);
+
+    int sun = CreateDirectionalLight();
+    SetEntityColor(sun, 255, 255, 255, 255); 
+    SetEntityRotation(sun, DegToRad(50.0f), 0.0f, 0.0f);
+    SetLightIntensity(sun, 2.1f);
      
     int ground = CreateCube();
     SetEntityPosition(ground, 0.0f, -1.0f, 0.0f);

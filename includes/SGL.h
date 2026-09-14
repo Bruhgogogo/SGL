@@ -104,6 +104,8 @@ extern "C" {
     SGL_API SGL_ENTITY  CreateCapsule();
     SGL_API SGL_ENTITY  CreateCylinder();
 
+    SGL_API SGL_ENTITY CreateDirectionalLight();
+
     SGL_API void SetEntityColor(SGL_ENTITY handle, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
     SGL_API void GetEntityColor(SGL_ENTITY handle, unsigned char* r, unsigned char* g, unsigned char* b, unsigned char* a);
 
@@ -112,6 +114,15 @@ extern "C" {
 
     SGL_API void SetEntityMeshID(SGL_ENTITY handle, SGL_MESH meshID);
     SGL_API SGL_MESH  GetEntityMeshID(SGL_ENTITY handle);
+
+    SGL_API void SetLightIntensity(SGL_ENTITY handle, float intensity);
+    SGL_API float GetLightIntensity(SGL_ENTITY handle);
+
+    SGL_API void SetLightShadow(SGL_ENTITY handle, SGL_BOOL shadow);
+    SGL_API SGL_BOOL GetLightShadow(SGL_ENTITY handle);
+
+    SGL_API void SetLightSpecular(SGL_ENTITY handle, SGL_BOOL specular);
+    SGL_API SGL_BOOL GetLightSpecular(SGL_ENTITY handle);
 
     SGL_API SGL_BOOL IsEntityValid(SGL_ENTITY handle);
 
@@ -156,6 +167,9 @@ extern "C" {
     SGL_API void ApplyEntityAngularImpulse(SGL_ENTITY handle, float wx, float wy, float wz);
 
     SGL_API SGL_RayHit Raycast(SGL_Ray ray);
+
+    SGL_API void SetGravity(float x, float y, float z);
+    SGL_API void GetGravity(float* x, float* y, float* z);
 
     SGL_API double GetElapsedTime();
 

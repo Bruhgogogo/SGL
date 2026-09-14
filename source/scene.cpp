@@ -585,6 +585,41 @@ namespace SGL
         return renderList;
     }
 
+    void Scene::CollectLightList()
+    {
+        directionalLightList.clear();
+
+        for (int handle = 0; handle < (int)alive.size(); handle++)
+        {
+            if (!IsAlive(handle)) continue;
+            if (!HasComponent<DirectionalLight>(handle)) continue;
+            if (!HasComponent<Transform>(handle)) continue;
+            if (!HasComponent<Color>(handle)) continue;
+            if (!HasComponent<Visible>(handle)) continue;
+            if (GetComponent<Visible>(handle).value == 0) continue;
+
+            const Transform& world = GetWorldTransform(handle);
+            const Color& color = GetComponent<Color>(handle);
+            const DirectionalLight& light = GetComponent<DirectionalLight>(handle);
+
+            DirectionalLightItem item;
+            item.direction = Vector3RotateByQuaternion({ 0.0f, -1.0f, 0.0f }, world.rotation);
+            item.color = {
+                color.r / 255.0f,
+                color.g / 255.0f,
+                color.b / 255.0f
+            };
+            item.intensity = light.intensity;
+
+            directionalLightList.push_back(item);
+        }
+    }
+
+    const std::vector<DirectionalLightItem>& Scene::GetDirectionalLightList() const
+    {
+        return directionalLightList;
+    }
+
     void Scene::SetEntityMeshID(int handle, int meshID)
     {
         if (!HasComponent<MeshID>(handle)) return;
@@ -657,4 +692,5 @@ namespace SGL
     SGL_INSTANTIATE_COMPONENT(CylinderShape);
     SGL_INSTANTIATE_COMPONENT(AABB);
     SGL_INSTANTIATE_COMPONENT(MeshID);
+    SGL_INSTANTIATE_COMPONENT(DirectionalLight);
 }

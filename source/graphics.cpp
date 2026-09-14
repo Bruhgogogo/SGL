@@ -26,6 +26,13 @@ namespace SGL
     static int     GroundAmbientLoc = -1;
     static int     SkyAmbientLoc = -1;
 
+    static const int MaxDirLights = 2;
+
+    static int DirLightCountLoc = -1;
+    static int DirLightDirectionsLoc = -1;
+    static int DirLightColorsLoc = -1;
+    static int DirLightIntensitiesLoc = -1;
+
     // ====================================================================================================
     // UTILS
     // ====================================================================================================
@@ -89,6 +96,11 @@ namespace SGL
 
         GroundAmbientLoc = GetShaderLocation(StandardShader, "groundAmbient");
         SkyAmbientLoc = GetShaderLocation(StandardShader, "skyAmbient");
+
+        DirLightCountLoc = GetShaderLocation(StandardShader, "dirLightCount");
+        DirLightDirectionsLoc = GetShaderLocation(StandardShader, "dirLightDirections");
+        DirLightColorsLoc = GetShaderLocation(StandardShader, "dirLightColors");
+        DirLightIntensitiesLoc = GetShaderLocation(StandardShader, "dirLightIntensities");
 
         EnsureCubeModel();
         EnsureSphereModel();
@@ -266,6 +278,42 @@ namespace SGL
 
         SetShaderValue(StandardShader, GroundAmbientLoc, &GroundAmbient, SHADER_UNIFORM_VEC3);
         SetShaderValue(StandardShader, SkyAmbientLoc, &SkyAmbient, SHADER_UNIFORM_VEC3);
+
+        scene.CollectLightList();
+
+        const std::vector<DirectionalLightItem>& dirLightList = scene.GetDirectionalLightList();
+
+        float dirLightDirections[MaxDirLights * 3] = {};
+        float dirLightColors[MaxDirLights * 3] = {};
+        float dirLightIntensities[MaxDirLights] = {};
+
+        int dirLightCount = 0;
+
+        for (int i = 0; i < (int)dirLightList.size() && dirLightCount < MaxDirLights; i++)
+        {
+            const DirectionalLightItem& light = dirLightList[i];
+
+            dirLightDirections[dirLightCount * 3 + 0] = light.direction.x;
+            dirLightDirections[dirLightCount * 3 + 1] = light.direction.y;
+            dirLightDirections[dirLightCount * 3 + 2] = light.direction.z;
+
+            dirLightColors[dirLightCount * 3 + 0] = light.color.x;
+            dirLightColors[dirLightCount * 3 + 1] = light.color.y;
+            dirLightColors[dirLightCount * 3 + 2] = light.color.z;
+
+            dirLightIntensities[dirLightCount] = light.intensity;
+
+            dirLightCount++;
+        }
+
+        SetShaderValue(StandardShader, DirLightCountLoc, &dirLightCount, SHADER_UNIFORM_INT);
+
+        if (dirLightCount > 0)
+        {
+            SetShaderValueV(StandardShader, DirLightDirectionsLoc, dirLightDirections, SHADER_UNIFORM_VEC3, dirLightCount);
+            SetShaderValueV(StandardShader, DirLightColorsLoc, dirLightColors, SHADER_UNIFORM_VEC3, dirLightCount);
+            SetShaderValueV(StandardShader, DirLightIntensitiesLoc, dirLightIntensities, SHADER_UNIFORM_FLOAT, dirLightCount);
+        }
 
         const std::vector<RenderItem>& list = scene.GetRenderList();
 

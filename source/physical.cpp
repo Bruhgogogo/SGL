@@ -471,6 +471,20 @@ namespace SGL
         bodyInterface->SetObjectLayer(id, layer);
     }
 
+    void JoltWorld::SetGravity(float x, float y, float z)
+    {
+        physicsSystem.SetGravity(JPH::Vec3(x, y, z));
+    }
+
+    void JoltWorld::GetGravity(float* x, float* y, float* z)
+    {
+        JPH::Vec3 gravity = physicsSystem.GetGravity();
+
+        *x = gravity.GetX();
+        *y = gravity.GetY();
+        *z = gravity.GetZ();
+    }
+
     SGL_RayHit JoltWorld::Raycast(SGL_Ray ray)
     {
         SGL_RayHit result = {};

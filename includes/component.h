@@ -22,6 +22,13 @@ namespace SGL
         unsigned char a = 255;
     };
 
+    struct DirectionalLight
+    {
+        float intensity = 1.0f;
+        int   shadow = 0;
+        int   specular = 0;
+    };
+
     struct Visible
     {
         int value = 1;
@@ -100,5 +107,12 @@ namespace SGL
         Transform transform;
         Color     color;
         int       meshID;
+    };
+
+    struct DirectionalLightItem
+    {
+        Vector3 direction;
+        Vector3 color;
+        float   intensity;
     };
 }

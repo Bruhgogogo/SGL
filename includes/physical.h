@@ -40,6 +40,9 @@ namespace SGL
         void SetBodyCollide(int handle, bool collide);
         void SetBodyAnchored(int handle, bool anchored);
 
+        void SetGravity(float x, float y, float z);
+        void GetGravity(float* x, float* y, float* z);
+
         SGL_RayHit Raycast(SGL_Ray ray);
 
         void SyncFromECS(int handle, const Transform& world);

@@ -462,6 +462,9 @@
     <ClCompile Include="source\attachment.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\directionalLight.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\SGL.h">
@@ -1416,6 +1419,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="includes\attachment.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\directionalLight.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

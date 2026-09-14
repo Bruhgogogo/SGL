@@ -145,6 +145,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\attachment.cpp" />
+    <ClCompile Include="source\directionalLight.cpp" />
     <ClCompile Include="third_party\Jolt\AABBTree\AABBTreeBuilder.cpp" />
     <ClCompile Include="third_party\Jolt\Core\Color.cpp" />
     <ClCompile Include="third_party\Jolt\Core\Factory.cpp" />
@@ -295,6 +296,7 @@
     <ClInclude Include="includes\component.h" />
     <ClInclude Include="includes\cube.h" />
     <ClInclude Include="includes\cylinder.h" />
+    <ClInclude Include="includes\directionalLight.h" />
     <ClInclude Include="includes\graphics.h" />
     <ClInclude Include="third_party\Jolt\AABBTree\AABBTreeBuilder.h" />
     <ClInclude Include="third_party\Jolt\AABBTree\AABBTreeToBuffer.h" />

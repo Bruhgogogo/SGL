@@ -102,6 +102,9 @@ namespace SGL
         void CollectRenderList();
         const std::vector<RenderItem>& GetRenderList() const;
 
+        void CollectLightList();
+        const std::vector<DirectionalLightItem>& GetDirectionalLightList() const;
+
         void SetEntityPosition(int handle, float x, float y, float z);
         void GetEntityPosition(int handle, float* x, float* y, float* z);
         void GetEntityLocalPosition(int handle, float* x, float* y, float* z);
@@ -139,6 +142,7 @@ namespace SGL
         std::vector<void (*)(void*, int)> poolRemovers;
 
         std::vector<RenderItem> renderList;
+        std::vector<DirectionalLightItem> directionalLightList;
 
         template <typename T>
         ComponentPool<T>& GetPool();
@@ -164,6 +168,7 @@ namespace SGL
     SGL_DECLARE_COMPONENT(CylinderShape);
     SGL_DECLARE_COMPONENT(AABB);
     SGL_DECLARE_COMPONENT(MeshID);
+    SGL_DECLARE_COMPONENT(DirectionalLight);
 
     // ====================================================================================================
     // APIs
