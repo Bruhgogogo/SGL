@@ -29,6 +29,14 @@ namespace SGL
         int   specular = 0;
     };
 
+    struct PointLight
+    {
+        float intensity = 1.0f;
+        float range = 10.0f;
+        int   shadow = 0;
+        int   specular = 0;
+    };
+
     struct Visible
     {
         int value = 1;
@@ -114,5 +122,13 @@ namespace SGL
         Vector3 direction;
         Vector3 color;
         float   intensity;
+    };
+
+    struct PointLightItem
+    {
+        Vector3 position;
+        Vector3 color;
+        float   intensity;
+        float   range;
     };
 }

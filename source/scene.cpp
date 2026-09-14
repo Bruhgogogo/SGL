@@ -588,11 +588,11 @@ namespace SGL
     void Scene::CollectLightList()
     {
         directionalLightList.clear();
+        pointLightList.clear();
 
         for (int handle = 0; handle < (int)alive.size(); handle++)
         {
             if (!IsAlive(handle)) continue;
-            if (!HasComponent<DirectionalLight>(handle)) continue;
             if (!HasComponent<Transform>(handle)) continue;
             if (!HasComponent<Color>(handle)) continue;
             if (!HasComponent<Visible>(handle)) continue;
@@ -600,24 +600,50 @@ namespace SGL
 
             const Transform& world = GetWorldTransform(handle);
             const Color& color = GetComponent<Color>(handle);
-            const DirectionalLight& light = GetComponent<DirectionalLight>(handle);
 
-            DirectionalLightItem item;
-            item.direction = Vector3RotateByQuaternion({ 0.0f, -1.0f, 0.0f }, world.rotation);
-            item.color = {
+            Vector3 rgb = {
                 color.r / 255.0f,
                 color.g / 255.0f,
                 color.b / 255.0f
             };
-            item.intensity = light.intensity;
 
-            directionalLightList.push_back(item);
+            if (HasComponent<DirectionalLight>(handle))
+            {
+                const DirectionalLight& light = GetComponent<DirectionalLight>(handle);
+
+                DirectionalLightItem item;
+                item.direction = Vector3RotateByQuaternion({ 0.0f, -1.0f, 0.0f }, world.rotation);
+                item.color = rgb;
+                item.intensity = light.intensity;
+
+                directionalLightList.push_back(item);
+            }
+
+            if (HasComponent<PointLight>(handle))
+            {
+                const PointLight& light = GetComponent<PointLight>(handle);
+
+                if (light.range <= 0.0f) return;
+
+                PointLightItem item;
+                item.position = world.position;
+                item.color = rgb;
+                item.intensity = light.intensity;
+                item.range = light.range;
+
+                pointLightList.push_back(item);
+            }
         }
     }
 
     const std::vector<DirectionalLightItem>& Scene::GetDirectionalLightList() const
     {
         return directionalLightList;
+    }
+
+    const std::vector<PointLightItem>& Scene::GetPointLightList() const
+    {
+        return pointLightList;
     }
 
     void Scene::SetEntityMeshID(int handle, int meshID)
@@ -693,4 +719,5 @@ namespace SGL
     SGL_INSTANTIATE_COMPONENT(AABB);
     SGL_INSTANTIATE_COMPONENT(MeshID);
     SGL_INSTANTIATE_COMPONENT(DirectionalLight);
+    SGL_INSTANTIATE_COMPONENT(PointLight);
 }

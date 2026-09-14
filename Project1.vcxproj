@@ -146,6 +146,7 @@
   <ItemGroup>
     <ClCompile Include="source\attachment.cpp" />
     <ClCompile Include="source\directionalLight.cpp" />
+    <ClCompile Include="source\pointLight.cpp" />
     <ClCompile Include="third_party\Jolt\AABBTree\AABBTreeBuilder.cpp" />
     <ClCompile Include="third_party\Jolt\Core\Color.cpp" />
     <ClCompile Include="third_party\Jolt\Core\Factory.cpp" />
@@ -298,6 +299,7 @@
     <ClInclude Include="includes\cylinder.h" />
     <ClInclude Include="includes\directionalLight.h" />
     <ClInclude Include="includes\graphics.h" />
+    <ClInclude Include="includes\pointLight.h" />
     <ClInclude Include="third_party\Jolt\AABBTree\AABBTreeBuilder.h" />
     <ClInclude Include="third_party\Jolt\AABBTree\AABBTreeToBuffer.h" />
     <ClInclude Include="third_party\Jolt\AABBTree\NodeCodec\NodeCodecQuadTreeHalfFloat.h" />

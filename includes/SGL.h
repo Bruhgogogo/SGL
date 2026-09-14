@@ -105,6 +105,7 @@ extern "C" {
     SGL_API SGL_ENTITY  CreateCylinder();
 
     SGL_API SGL_ENTITY CreateDirectionalLight();
+    SGL_API SGL_ENTITY CreatePointLight();
 
     SGL_API void SetEntityColor(SGL_ENTITY handle, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
     SGL_API void GetEntityColor(SGL_ENTITY handle, unsigned char* r, unsigned char* g, unsigned char* b, unsigned char* a);
@@ -123,6 +124,9 @@ extern "C" {
 
     SGL_API void SetLightSpecular(SGL_ENTITY handle, SGL_BOOL specular);
     SGL_API SGL_BOOL GetLightSpecular(SGL_ENTITY handle);
+
+    SGL_API void SetLightRange(SGL_ENTITY handle, float range);
+    SGL_API float GetLightRange(SGL_ENTITY handle);
 
     SGL_API SGL_BOOL IsEntityValid(SGL_ENTITY handle);
 

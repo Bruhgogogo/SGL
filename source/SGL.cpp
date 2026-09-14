@@ -8,6 +8,7 @@
 #include "capsule.h"
 #include "cylinder.h"
 #include "directionalLight.h"
+#include "pointLight.h"
 #include "raylibUtils.h"
 #include "mathUtils.h"
 #include "physical.h"
@@ -249,6 +250,11 @@ SGL_API SGL_ENTITY CreateDirectionalLight()
     return SGL::CreateDirectionalLight();
 }
 
+SGL_API SGL_ENTITY CreatePointLight()
+{
+    return SGL::CreatePointLight();
+}
+
 SGL_API void SetEntityColor(SGL_ENTITY handle, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Color>(handle)) return;
@@ -301,44 +307,113 @@ SGL_API SGL_MESH GetEntityMeshID(SGL_ENTITY handle)
 
 SGL_API void SetLightIntensity(SGL_ENTITY handle, float intensity)
 {
-    if (!SGL::GetSceneInstance().HasComponent<SGL::DirectionalLight>(handle)) return;
+    SGL::Scene& scene = SGL::GetSceneInstance();
 
-    SGL::GetSceneInstance().GetComponent<SGL::DirectionalLight>(handle).intensity = intensity;
+    if (scene.HasComponent<SGL::DirectionalLight>(handle))
+    {
+        scene.GetComponent<SGL::DirectionalLight>(handle).intensity = intensity;
+        return;
+    }
+
+    if (scene.HasComponent<SGL::PointLight>(handle))
+    {
+        scene.GetComponent<SGL::PointLight>(handle).intensity = intensity;
+        return;
+    }
 }
 
 SGL_API float GetLightIntensity(SGL_ENTITY handle)
 {
-    if (!SGL::GetSceneInstance().HasComponent<SGL::DirectionalLight>(handle)) return 0.0f;
+    SGL::Scene& scene = SGL::GetSceneInstance();
 
-    return SGL::GetSceneInstance().GetComponent<SGL::DirectionalLight>(handle).intensity;
+    if (scene.HasComponent<SGL::DirectionalLight>(handle))
+        return scene.GetComponent<SGL::DirectionalLight>(handle).intensity;
+
+    if (scene.HasComponent<SGL::PointLight>(handle))
+        return scene.GetComponent<SGL::PointLight>(handle).intensity;
+
+    return 0.0f;
 }
 
 SGL_API void SetLightShadow(SGL_ENTITY handle, SGL_BOOL shadow)
 {
-    if (!SGL::GetSceneInstance().HasComponent<SGL::DirectionalLight>(handle)) return;
+    SGL::Scene& scene = SGL::GetSceneInstance();
 
-    SGL::GetSceneInstance().GetComponent<SGL::DirectionalLight>(handle).shadow = shadow;
+    if (scene.HasComponent<SGL::DirectionalLight>(handle))
+    {
+        scene.GetComponent<SGL::DirectionalLight>(handle).shadow = shadow;
+        return;
+    }
+
+    if (scene.HasComponent<SGL::PointLight>(handle))
+    {
+        scene.GetComponent<SGL::PointLight>(handle).shadow = shadow;
+        return;
+    }
 }
 
 SGL_API SGL_BOOL GetLightShadow(SGL_ENTITY handle)
 {
-    if (!SGL::GetSceneInstance().HasComponent<SGL::DirectionalLight>(handle)) return 0;
+    SGL::Scene& scene = SGL::GetSceneInstance();
 
-    return SGL::GetSceneInstance().GetComponent<SGL::DirectionalLight>(handle).shadow;
+    if (scene.HasComponent<SGL::DirectionalLight>(handle))
+        return scene.GetComponent<SGL::DirectionalLight>(handle).shadow;
+
+    if (scene.HasComponent<SGL::PointLight>(handle))
+        return scene.GetComponent<SGL::PointLight>(handle).shadow;
+
+    return 0;
 }
 
 SGL_API void SetLightSpecular(SGL_ENTITY handle, SGL_BOOL specular)
 {
-    if (!SGL::GetSceneInstance().HasComponent<SGL::DirectionalLight>(handle)) return;
+    SGL::Scene& scene = SGL::GetSceneInstance();
 
-    SGL::GetSceneInstance().GetComponent<SGL::DirectionalLight>(handle).specular = specular;
+    if (scene.HasComponent<SGL::DirectionalLight>(handle))
+    {
+        scene.GetComponent<SGL::DirectionalLight>(handle).specular = specular;
+        return;
+    }
+
+    if (scene.HasComponent<SGL::PointLight>(handle))
+    {
+        scene.GetComponent<SGL::PointLight>(handle).specular = specular;
+        return;
+    }
 }
 
 SGL_API SGL_BOOL GetLightSpecular(SGL_ENTITY handle)
 {
-    if (!SGL::GetSceneInstance().HasComponent<SGL::DirectionalLight>(handle)) return 0;
+    SGL::Scene& scene = SGL::GetSceneInstance();
 
-    return SGL::GetSceneInstance().GetComponent<SGL::DirectionalLight>(handle).specular;
+    if (scene.HasComponent<SGL::DirectionalLight>(handle))
+        return scene.GetComponent<SGL::DirectionalLight>(handle).specular;
+
+    if (scene.HasComponent<SGL::PointLight>(handle))
+        return scene.GetComponent<SGL::PointLight>(handle).specular;
+
+    return 0;
+}
+
+void SetLightRange(SGL_ENTITY handle, float range)
+{
+    SGL::Scene& scene = SGL::GetSceneInstance();
+
+    if (scene.HasComponent<SGL::PointLight>(handle))
+    {
+        scene.GetComponent<SGL::PointLight>(handle).range = range;
+        return;
+    }
+}
+
+SGL_API float GetLightRange(SGL_ENTITY handle)
+{
+    SGL::Scene& scene = SGL::GetSceneInstance();
+
+    if (scene.HasComponent<SGL::PointLight>(handle))
+        return scene.GetComponent<SGL::PointLight>(handle).range;
+
+    return 0.0f;
 }
 
 SGL_API SGL_BOOL IsEntityValid(SGL_ENTITY handle)

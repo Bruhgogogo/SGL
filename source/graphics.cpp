@@ -33,6 +33,14 @@ namespace SGL
     static int DirLightColorsLoc = -1;
     static int DirLightIntensitiesLoc = -1;
 
+    static const int MaxPointLights = 8;
+
+    static int PointLightCountLoc = -1;
+    static int PointLightPositionsLoc = -1;
+    static int PointLightColorsLoc = -1;
+    static int PointLightIntensitiesLoc = -1;
+    static int PointLightRangesLoc = -1;
+
     // ====================================================================================================
     // UTILS
     // ====================================================================================================
@@ -101,6 +109,12 @@ namespace SGL
         DirLightDirectionsLoc = GetShaderLocation(StandardShader, "dirLightDirections");
         DirLightColorsLoc = GetShaderLocation(StandardShader, "dirLightColors");
         DirLightIntensitiesLoc = GetShaderLocation(StandardShader, "dirLightIntensities");
+
+        PointLightCountLoc = GetShaderLocation(StandardShader, "pointLightCount");
+        PointLightPositionsLoc = GetShaderLocation(StandardShader, "pointLightPositions");
+        PointLightColorsLoc = GetShaderLocation(StandardShader, "pointLightColors");
+        PointLightIntensitiesLoc = GetShaderLocation(StandardShader, "pointLightIntensities");
+        PointLightRangesLoc = GetShaderLocation(StandardShader, "pointLightRanges");
 
         EnsureCubeModel();
         EnsureSphereModel();
@@ -313,6 +327,43 @@ namespace SGL
             SetShaderValueV(StandardShader, DirLightDirectionsLoc, dirLightDirections, SHADER_UNIFORM_VEC3, dirLightCount);
             SetShaderValueV(StandardShader, DirLightColorsLoc, dirLightColors, SHADER_UNIFORM_VEC3, dirLightCount);
             SetShaderValueV(StandardShader, DirLightIntensitiesLoc, dirLightIntensities, SHADER_UNIFORM_FLOAT, dirLightCount);
+        }
+
+        const std::vector<PointLightItem>& pointLightList = scene.GetPointLightList();
+
+        float pointLightPositions[MaxPointLights * 3] = {};
+        float pointLightColors[MaxPointLights * 3] = {};
+        float pointLightIntensities[MaxPointLights] = {};
+        float pointLightRanges[MaxPointLights] = {};
+
+        int pointLightCount = 0;
+
+        for (int i = 0; i < (int)pointLightList.size() && pointLightCount < MaxPointLights; i++)
+        {
+            const PointLightItem& light = pointLightList[i];
+
+            pointLightPositions[pointLightCount * 3 + 0] = light.position.x;
+            pointLightPositions[pointLightCount * 3 + 1] = light.position.y;
+            pointLightPositions[pointLightCount * 3 + 2] = light.position.z;
+
+            pointLightColors[pointLightCount * 3 + 0] = light.color.x;
+            pointLightColors[pointLightCount * 3 + 1] = light.color.y;
+            pointLightColors[pointLightCount * 3 + 2] = light.color.z;
+
+            pointLightIntensities[pointLightCount] = light.intensity;
+            pointLightRanges[pointLightCount] = light.range;
+
+            pointLightCount++;
+        }
+
+        SetShaderValue(StandardShader, PointLightCountLoc, &pointLightCount, SHADER_UNIFORM_INT);
+
+        if (pointLightCount > 0)
+        {
+            SetShaderValueV(StandardShader, PointLightPositionsLoc, pointLightPositions, SHADER_UNIFORM_VEC3, pointLightCount);
+            SetShaderValueV(StandardShader, PointLightColorsLoc, pointLightColors, SHADER_UNIFORM_VEC3, pointLightCount);
+            SetShaderValueV(StandardShader, PointLightIntensitiesLoc, pointLightIntensities, SHADER_UNIFORM_FLOAT, pointLightCount);
+            SetShaderValueV(StandardShader, PointLightRangesLoc, pointLightRanges, SHADER_UNIFORM_FLOAT, pointLightCount);
         }
 
         const std::vector<RenderItem>& list = scene.GetRenderList();
