@@ -493,10 +493,10 @@
       <Filter>源文件\Entites</Filter>
     </ClCompile>
     <ClCompile Include="source\mesh.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\Modules</Filter>
     </ClCompile>
     <ClCompile Include="source\meshEntity.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\Entites</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1463,11 +1463,11 @@
     <ClInclude Include="includes\attachment.h">
       <Filter>头文件\Entites</Filter>
     </ClInclude>
-    <ClInclude Include="includes\mesh.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="includes\meshEntity.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\Entites</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\mesh.h">
+      <Filter>头文件\Modules</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

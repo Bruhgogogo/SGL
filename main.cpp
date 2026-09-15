@@ -65,6 +65,7 @@ int main()
 
     int monkey = CreateMesh(monkeyMesh);
     SetEntityPosition(monkey, 4.0f, 8.0f, 0.0f);
+    SetEntityScale(monkey, 1.0f, 3.0f, 1.0f);
     SetEntityColor(monkey, 80, 255, 160, 255);
     SetEntityAnchored(monkey, 0);
 

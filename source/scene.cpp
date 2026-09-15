@@ -526,6 +526,7 @@ namespace SGL
         if (HasComponent<SphereShape>(handle))   GetComponent<SphereShape>(handle).dirty = 1;
         if (HasComponent<CapsuleShape>(handle))  GetComponent<CapsuleShape>(handle).dirty = 1;
         if (HasComponent<CylinderShape>(handle)) GetComponent<CylinderShape>(handle).dirty = 1;
+        if (HasComponent<MeshShape>(handle))     GetComponent<MeshShape>(handle).dirty = 1;
 
         UpdateEntityTree(handle);
     }

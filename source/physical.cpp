@@ -730,6 +730,8 @@ namespace SGL
 
             if (shape.dirty == 0) return;
 
+            Vector3 localScale = scene.GetComponent<Transform>(handle).scale;
+
             for (int i = 0; i < shape.partCount; i++)
             {
                 Vector3 localHalf = {
@@ -745,15 +747,15 @@ namespace SGL
                 };
 
                 shape.worldHalfExtents[i] = {
-                    localHalf.x * world.scale.x,
-                    localHalf.y * world.scale.y,
-                    localHalf.z * world.scale.z
+                    localHalf.x * localScale.x,
+                    localHalf.y * localScale.y,
+                    localHalf.z * localScale.z
                 };
 
                 shape.worldCenters[i] = {
-                    localCenter.x * world.scale.x,
-                    localCenter.y * world.scale.y,
-                    localCenter.z * world.scale.z
+                    localCenter.x * localScale.x,
+                    localCenter.y * localScale.y,
+                    localCenter.z * localScale.z
                 };
             }
 
