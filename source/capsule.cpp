@@ -1,5 +1,6 @@
 #include "capsule.h"
 #include "physical.h"
+#include "graphics.h"
 
 // ====================================================================================================
 // NAMESPACE
@@ -24,7 +25,7 @@ namespace SGL
         scene.AddComponent<Physical>(handle, Physical());
 
         MeshID meshID;
-        meshID.value = 2;
+        meshID.value = GetBuiltinCapsuleMeshHandle();
         scene.AddComponent<MeshID>(handle, meshID);
 
         CapsuleShape capsule;

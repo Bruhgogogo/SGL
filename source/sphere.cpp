@@ -1,5 +1,6 @@
 #include "sphere.h"
 #include "physical.h"
+#include "graphics.h"
 
 // ====================================================================================================
 // NAMESPACE
@@ -24,7 +25,7 @@ namespace SGL
         scene.AddComponent<Physical>(handle, Physical());
 
         MeshID meshID;
-        meshID.value = 1;
+        meshID.value = GetBuiltinSphereMeshHandle();
         scene.AddComponent<MeshID>(handle, meshID);
 
         SphereShape sphere;

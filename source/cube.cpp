@@ -1,5 +1,6 @@
 #include "cube.h"
 #include "physical.h"
+#include "graphics.h"
 
 // ====================================================================================================
 // NAMESPACE
@@ -22,7 +23,10 @@ namespace SGL
         scene.AddComponent<Color>(handle, Color());
         scene.AddComponent<Visible>(handle, Visible());
         scene.AddComponent<Physical>(handle, Physical());
-        scene.AddComponent<MeshID>(handle, MeshID());
+
+        MeshID meshID;
+        meshID.value = GetBuiltinCubeMeshHandle();
+        scene.AddComponent<MeshID>(handle, meshID);
 
         BoxShape box;
         box.localHalfExtents = { 0.5f, 0.5f, 0.5f };

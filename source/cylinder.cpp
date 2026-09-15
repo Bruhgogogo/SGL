@@ -1,5 +1,6 @@
 #include "cylinder.h"
 #include "physical.h"
+#include "graphics.h"
 
 // ====================================================================================================
 // NAMESPACE
@@ -24,7 +25,7 @@ namespace SGL
         scene.AddComponent<Physical>(handle, Physical());
 
         MeshID meshID;
-        meshID.value = 3;
+        meshID.value = GetBuiltinCylinderMeshHandle();
         scene.AddComponent<MeshID>(handle, meshID);
 
         CylinderShape cylinder;

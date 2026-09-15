@@ -589,6 +589,7 @@ namespace SGL
     {
         directionalLightList.clear();
         pointLightList.clear();
+        spotLightList.clear();
 
         for (int handle = 0; handle < (int)alive.size(); handle++)
         {
@@ -623,7 +624,7 @@ namespace SGL
             {
                 const PointLight& light = GetComponent<PointLight>(handle);
 
-                if (light.range <= 0.0f) return;
+                if (light.range <= 0.0f) continue;
 
                 PointLightItem item;
                 item.position = world.position;

@@ -492,6 +492,9 @@
     <ClCompile Include="source\spotLight.cpp">
       <Filter>源文件\Entites</Filter>
     </ClCompile>
+    <ClCompile Include="source\mesh.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\mathUtils.h">
@@ -1456,6 +1459,9 @@
     </ClInclude>
     <ClInclude Include="includes\attachment.h">
       <Filter>头文件\Entites</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\mesh.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

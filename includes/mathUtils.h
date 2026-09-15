@@ -9,13 +9,7 @@ namespace SGL
         float ex, float ey, float ez,
         float& qx, float& qy, float& qz, float& qw)
     {
-        Quaternion Qx = QuaternionFromAxisAngle({ 1, 0, 0 }, ex);
-        Quaternion Qy = QuaternionFromAxisAngle({ 0, 1, 0 }, ey);
-        Quaternion Qz = QuaternionFromAxisAngle({ 0, 0, 1 }, ez);
-
-        Quaternion Q = QuaternionMultiply(Qz,
-            QuaternionMultiply(Qy, Qx));
-        Q = QuaternionNormalize(Q);
+        Quaternion Q = QuaternionFromEuler(ex, ey, ez);
 
         qx = Q.x; qy = Q.y; qz = Q.z; qw = Q.w;
     }
