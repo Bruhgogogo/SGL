@@ -4,6 +4,8 @@
 
 namespace SGL
 {
+    constexpr int MAX_MESH_PARTS = 8;
+
     struct Transform
     {
         Vector3    position = { 0, 0, 0 };
@@ -103,6 +105,19 @@ namespace SGL
 
         float   worldRadius = 0.5f;
         float   worldHeight = 1.0f;
+
+        int dirty = 1;
+    };
+
+    struct MeshShape
+    {
+        int partCount = 0;
+
+        Vector3 localMin[MAX_MESH_PARTS];
+        Vector3 localMax[MAX_MESH_PARTS];
+
+        Vector3 worldHalfExtents[MAX_MESH_PARTS];
+        Vector3 worldCenters[MAX_MESH_PARTS];
 
         int dirty = 1;
     };

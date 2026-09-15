@@ -147,6 +147,7 @@
     <ClCompile Include="source\attachment.cpp" />
     <ClCompile Include="source\directionalLight.cpp" />
     <ClCompile Include="source\mesh.cpp" />
+    <ClCompile Include="source\meshEntity.cpp" />
     <ClCompile Include="source\pointLight.cpp" />
     <ClCompile Include="source\spotLight.cpp" />
     <ClCompile Include="third_party\Jolt\AABBTree\AABBTreeBuilder.cpp" />
@@ -302,6 +303,7 @@
     <ClInclude Include="includes\directionalLight.h" />
     <ClInclude Include="includes\graphics.h" />
     <ClInclude Include="includes\mesh.h" />
+    <ClInclude Include="includes\meshEntity.h" />
     <ClInclude Include="includes\pointLight.h" />
     <ClInclude Include="includes\spotLight.h" />
     <ClInclude Include="third_party\Jolt\AABBTree\AABBTreeBuilder.h" />

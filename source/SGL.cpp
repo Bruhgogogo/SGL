@@ -7,6 +7,7 @@
 #include "sphere.h"
 #include "capsule.h"
 #include "cylinder.h"
+#include "meshEntity.h"
 #include "directionalLight.h"
 #include "pointLight.h"
 #include "spotLight.h"
@@ -132,11 +133,6 @@ SGL_API void GetSkyAmbient(float* r, float* g, float* b)
     SGL::GraphicsGetSkyAmbient(r, g, b);
 }
 
-SGL_API SGL_ENTITY CreateEntity()
-{
-    return SGL::GetSceneInstance().CreateEntity();
-}
-
 static void DestroyEntityRecursive(SGL_ENTITY handle)
 {
     SGL::Scene& scene = SGL::GetSceneInstance();
@@ -244,6 +240,11 @@ SGL_API SGL_ENTITY CreateCapsule()
 SGL_API SGL_ENTITY CreateCylinder()
 {
     return SGL::CreateCylinder();
+}
+
+SGL_API SGL_ENTITY CreateMesh(SGL_MESH meshHandle)
+{
+    return SGL::CreateMesh(meshHandle);
 }
 
 SGL_API SGL_ENTITY CreateDirectionalLight()
@@ -694,6 +695,16 @@ SGL_API void SetGravity(float x, float y, float z)
 SGL_API void GetGravity(float* x, float* y, float* z)
 {
     SGL::GetJoltWorldInstance().GetGravity(x, y, z);
+}
+
+SGL_API SGL_MESH LoadMeshAsset(const char* fileName)
+{
+    return SGL::LoadMesh(fileName);
+}
+
+SGL_API void UnloadMeshAsset(SGL_MESH handle)
+{
+    SGL::UnloadMesh(handle);
 }
 
 SGL_API double GetElapsedTime()

@@ -32,6 +32,9 @@ namespace SGL
     int GetBuiltinCapsuleMeshHandle();
     int GetBuiltinCylinderMeshHandle();
 
+    int  LoadMesh(const char* fileName);
+    void UnloadMesh(int handle);
+
     void AABBUpdateWorld(int handle);
 
     void GraphicsRender();

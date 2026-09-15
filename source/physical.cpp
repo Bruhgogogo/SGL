@@ -21,6 +21,7 @@
 #include <Jolt/Physics/Collision/RayCast.h>
 #include <Jolt/Physics/Collision/CastResult.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
+#include <Jolt/Physics/Collision/Shape/MutableCompoundShape.h>
 
 // ====================================================================================================
 // NAMESPACE
@@ -274,6 +275,33 @@ namespace SGL
         {
             CylinderShape& shape = scene.GetComponent<CylinderShape>(handle);
             shapeSettings = new JPH::CylinderShapeSettings(shape.worldHeight * 0.5f, shape.worldRadius);
+        }
+        else if (scene.HasComponent<MeshShape>(handle))
+        {
+            MeshShape& shape = scene.GetComponent<MeshShape>(handle);
+
+            if (shape.partCount == 0) return;
+
+            JPH::MutableCompoundShapeSettings* compound = new JPH::MutableCompoundShapeSettings();
+
+            for (int i = 0; i < shape.partCount; i++)
+            {
+                JPH::BoxShapeSettings* box = new JPH::BoxShapeSettings(
+                    JPH::Vec3(
+                        shape.worldHalfExtents[i].x,
+                        shape.worldHalfExtents[i].y,
+                        shape.worldHalfExtents[i].z));
+
+                compound->AddShape(
+                    JPH::Vec3(
+                        shape.worldCenters[i].x,
+                        shape.worldCenters[i].y,
+                        shape.worldCenters[i].z),
+                    JPH::Quat::sIdentity(),
+                    box);
+            }
+
+            shapeSettings = compound;
         }
 
         if (!shapeSettings) return;
@@ -692,6 +720,42 @@ namespace SGL
 
             shape.worldRadius = shape.localRadius * world.scale.x;
             shape.worldHeight = shape.localHeight * world.scale.y;
+
+            shape.dirty = 0;
+            return;
+        }
+        if (scene.HasComponent<MeshShape>(handle))
+        {
+            MeshShape& shape = scene.GetComponent<MeshShape>(handle);
+
+            if (shape.dirty == 0) return;
+
+            for (int i = 0; i < shape.partCount; i++)
+            {
+                Vector3 localHalf = {
+                    (shape.localMax[i].x - shape.localMin[i].x) * 0.5f,
+                    (shape.localMax[i].y - shape.localMin[i].y) * 0.5f,
+                    (shape.localMax[i].z - shape.localMin[i].z) * 0.5f
+                };
+
+                Vector3 localCenter = {
+                    (shape.localMax[i].x + shape.localMin[i].x) * 0.5f,
+                    (shape.localMax[i].y + shape.localMin[i].y) * 0.5f,
+                    (shape.localMax[i].z + shape.localMin[i].z) * 0.5f
+                };
+
+                shape.worldHalfExtents[i] = {
+                    localHalf.x * world.scale.x,
+                    localHalf.y * world.scale.y,
+                    localHalf.z * world.scale.z
+                };
+
+                shape.worldCenters[i] = {
+                    localCenter.x * world.scale.x,
+                    localCenter.y * world.scale.y,
+                    localCenter.z * world.scale.z
+                };
+            }
 
             shape.dirty = 0;
             return;

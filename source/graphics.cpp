@@ -394,6 +394,25 @@ namespace SGL
         *b = SkyAmbient.z;
     }
 
+    int LoadMesh(const char* fileName)
+    {
+        int handle = RegisterMeshFromFile(fileName);
+
+        if (!IsMeshValid(handle)) return -1;
+
+        Model& model = GetMeshModel(handle);
+
+        for (int i = 0; i < model.materialCount; i++)
+            model.materials[i].shader = StandardShader;
+
+        return handle;
+    }
+
+    void UnloadMesh(int handle)
+    {
+        UnregisterModel(handle);
+    }
+
     void AABBUpdateWorld(int handle)
     {
         Scene& scene = GetSceneInstance();
@@ -434,6 +453,44 @@ namespace SGL
             float h = shape.worldHeight * 0.5f;
             localMin = { -shape.worldRadius, -h, -shape.worldRadius };
             localMax = { shape.worldRadius,  h,  shape.worldRadius };
+        }
+        else if (scene.HasComponent<MeshShape>(handle))
+        {
+            MeshShape& shape = scene.GetComponent<MeshShape>(handle);
+
+            if (shape.partCount == 0)
+            {
+                localMin = { 0, 0, 0 };
+                localMax = { 0, 0, 0 };
+            }
+            else
+            {
+                localMin = shape.worldCenters[0];
+                localMax = shape.worldCenters[0];
+
+                for (int i = 0; i < shape.partCount; i++)
+                {
+                    Vector3 partMin = {
+                        shape.worldCenters[i].x - shape.worldHalfExtents[i].x,
+                        shape.worldCenters[i].y - shape.worldHalfExtents[i].y,
+                        shape.worldCenters[i].z - shape.worldHalfExtents[i].z
+                    };
+
+                    Vector3 partMax = {
+                        shape.worldCenters[i].x + shape.worldHalfExtents[i].x,
+                        shape.worldCenters[i].y + shape.worldHalfExtents[i].y,
+                        shape.worldCenters[i].z + shape.worldHalfExtents[i].z
+                    };
+
+                    localMin.x = fminf(localMin.x, partMin.x);
+                    localMin.y = fminf(localMin.y, partMin.y);
+                    localMin.z = fminf(localMin.z, partMin.z);
+
+                    localMax.x = fmaxf(localMax.x, partMax.x);
+                    localMax.y = fmaxf(localMax.y, partMax.y);
+                    localMax.z = fmaxf(localMax.z, partMax.z);
+                }
+            }
         }
 
         Vector3 corners[8] = {

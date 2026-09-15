@@ -61,15 +61,12 @@ int main()
     SetEntityColor(sphere, 80, 255, 80, 255);
     SetEntityAnchored(sphere, 0);
 
-    int capsule = CreateCapsule();
-    SetEntityPosition(capsule, 4.0f, 8.0f, 0.0f);
-    SetEntityColor(capsule, 80, 255, 160, 255);
-    SetEntityAnchored(capsule, 0);
+    int monkeyMesh = LoadMeshAsset("monkey.obj");
 
-    int cylinder = CreateCylinder();
-    SetEntityPosition(cylinder, -4.0f, 8.0f, 0.0f);
-    SetEntityColor(cylinder, 80, 80, 255, 255);
-    SetEntityAnchored(cylinder, 0);
+    int monkey = CreateMesh(monkeyMesh);
+    SetEntityPosition(monkey, 4.0f, 8.0f, 0.0f);
+    SetEntityColor(monkey, 80, 255, 160, 255);
+    SetEntityAnchored(monkey, 0);
 
     while (!IsWindowShouldClose())
     {

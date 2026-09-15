@@ -81,7 +81,6 @@ extern "C" {
     SGL_API void SetSkyAmbient(float r, float g, float b);
     SGL_API void GetSkyAmbient(float* r, float* g, float* b);
 
-    SGL_API SGL_ENTITY  CreateEntity();
     SGL_API void DestroyEntity(SGL_ENTITY handle);
 
     SGL_API void SetParent(SGL_ENTITY child, SGL_ENTITY parent);
@@ -103,6 +102,7 @@ extern "C" {
     SGL_API SGL_ENTITY  CreateSphere();
     SGL_API SGL_ENTITY  CreateCapsule();
     SGL_API SGL_ENTITY  CreateCylinder();
+    SGL_API SGL_ENTITY CreateMesh(SGL_MESH meshHandle);
 
     SGL_API SGL_ENTITY CreateDirectionalLight();
     SGL_API SGL_ENTITY CreatePointLight();
@@ -181,6 +181,9 @@ extern "C" {
 
     SGL_API void SetGravity(float x, float y, float z);
     SGL_API void GetGravity(float* x, float* y, float* z);
+
+    SGL_API SGL_MESH LoadMeshAsset(const char* fileName);
+    SGL_API void UnloadMeshAsset(SGL_MESH handle);
 
     SGL_API double GetElapsedTime();
 
