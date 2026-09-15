@@ -41,6 +41,17 @@ namespace SGL
     static int PointLightIntensitiesLoc = -1;
     static int PointLightRangesLoc = -1;
 
+    static const int MaxSpotLights = 8;
+
+    static int SpotLightCountLoc = -1;
+    static int SpotLightPositionsLoc = -1;
+    static int SpotLightDirectionsLoc = -1;
+    static int SpotLightColorsLoc = -1;
+    static int SpotLightIntensitiesLoc = -1;
+    static int SpotLightRangesLoc = -1;
+    static int SpotLightCosInnerLoc = -1;
+    static int SpotLightCosOuterLoc = -1;
+
     // ====================================================================================================
     // UTILS
     // ====================================================================================================
@@ -115,6 +126,15 @@ namespace SGL
         PointLightColorsLoc = GetShaderLocation(StandardShader, "pointLightColors");
         PointLightIntensitiesLoc = GetShaderLocation(StandardShader, "pointLightIntensities");
         PointLightRangesLoc = GetShaderLocation(StandardShader, "pointLightRanges");
+        
+        SpotLightCountLoc = GetShaderLocation(StandardShader, "spotLightCount");
+        SpotLightPositionsLoc = GetShaderLocation(StandardShader, "spotLightPositions");
+        SpotLightDirectionsLoc = GetShaderLocation(StandardShader, "spotLightDirections");
+        SpotLightColorsLoc = GetShaderLocation(StandardShader, "spotLightColors");
+        SpotLightIntensitiesLoc = GetShaderLocation(StandardShader, "spotLightIntensities");
+        SpotLightRangesLoc = GetShaderLocation(StandardShader, "spotLightRanges");
+        SpotLightCosInnerLoc = GetShaderLocation(StandardShader, "spotLightCosInner");
+        SpotLightCosOuterLoc = GetShaderLocation(StandardShader, "spotLightCosOuter");
 
         EnsureCubeModel();
         EnsureSphereModel();
@@ -364,6 +384,55 @@ namespace SGL
             SetShaderValueV(StandardShader, PointLightColorsLoc, pointLightColors, SHADER_UNIFORM_VEC3, pointLightCount);
             SetShaderValueV(StandardShader, PointLightIntensitiesLoc, pointLightIntensities, SHADER_UNIFORM_FLOAT, pointLightCount);
             SetShaderValueV(StandardShader, PointLightRangesLoc, pointLightRanges, SHADER_UNIFORM_FLOAT, pointLightCount);
+        }
+
+        const std::vector<SpotLightItem>& spotLightList = scene.GetSpotLightList();
+
+        float spotLightPositions[MaxSpotLights * 3] = {};
+        float spotLightDirections[MaxSpotLights * 3] = {};
+        float spotLightColors[MaxSpotLights * 3] = {};
+        float spotLightIntensities[MaxSpotLights] = {};
+        float spotLightRanges[MaxSpotLights] = {};
+        float spotLightCosInner[MaxSpotLights] = {};
+        float spotLightCosOuter[MaxSpotLights] = {};
+
+        int spotLightCount = 0;
+
+        for (int i = 0; i < (int)spotLightList.size() && spotLightCount < MaxSpotLights; i++)
+        {
+            const SpotLightItem& light = spotLightList[i];
+
+            spotLightPositions[spotLightCount * 3 + 0] = light.position.x;
+            spotLightPositions[spotLightCount * 3 + 1] = light.position.y;
+            spotLightPositions[spotLightCount * 3 + 2] = light.position.z;
+
+            spotLightDirections[spotLightCount * 3 + 0] = light.direction.x;
+            spotLightDirections[spotLightCount * 3 + 1] = light.direction.y;
+            spotLightDirections[spotLightCount * 3 + 2] = light.direction.z;
+
+            spotLightColors[spotLightCount * 3 + 0] = light.color.x;
+            spotLightColors[spotLightCount * 3 + 1] = light.color.y;
+            spotLightColors[spotLightCount * 3 + 2] = light.color.z;
+
+            spotLightIntensities[spotLightCount] = light.intensity;
+            spotLightRanges[spotLightCount] = light.range;
+            spotLightCosInner[spotLightCount] = light.cosInner;
+            spotLightCosOuter[spotLightCount] = light.cosOuter;
+
+            spotLightCount++;
+        }
+
+        SetShaderValue(StandardShader, SpotLightCountLoc, &spotLightCount, SHADER_UNIFORM_INT);
+
+        if (spotLightCount > 0)
+        {
+            SetShaderValueV(StandardShader, SpotLightPositionsLoc, spotLightPositions, SHADER_UNIFORM_VEC3, spotLightCount);
+            SetShaderValueV(StandardShader, SpotLightDirectionsLoc, spotLightDirections, SHADER_UNIFORM_VEC3, spotLightCount);
+            SetShaderValueV(StandardShader, SpotLightColorsLoc, spotLightColors, SHADER_UNIFORM_VEC3, spotLightCount);
+            SetShaderValueV(StandardShader, SpotLightIntensitiesLoc, spotLightIntensities, SHADER_UNIFORM_FLOAT, spotLightCount);
+            SetShaderValueV(StandardShader, SpotLightRangesLoc, spotLightRanges, SHADER_UNIFORM_FLOAT, spotLightCount);
+            SetShaderValueV(StandardShader, SpotLightCosInnerLoc, spotLightCosInner, SHADER_UNIFORM_FLOAT, spotLightCount);
+            SetShaderValueV(StandardShader, SpotLightCosOuterLoc, spotLightCosOuter, SHADER_UNIFORM_FLOAT, spotLightCount);
         }
 
         const std::vector<RenderItem>& list = scene.GetRenderList();

@@ -9,6 +9,7 @@
 #include "cylinder.h"
 #include "directionalLight.h"
 #include "pointLight.h"
+#include "spotLight.h"
 #include "raylibUtils.h"
 #include "mathUtils.h"
 #include "physical.h"
@@ -255,6 +256,11 @@ SGL_API SGL_ENTITY CreatePointLight()
     return SGL::CreatePointLight();
 }
 
+SGL_API SGL_ENTITY CreateSpotLight()
+{
+    return SGL::CreateSpotLight();
+}
+
 SGL_API void SetEntityColor(SGL_ENTITY handle, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
     if (!SGL::GetSceneInstance().HasComponent<SGL::Color>(handle)) return;
@@ -320,6 +326,12 @@ SGL_API void SetLightIntensity(SGL_ENTITY handle, float intensity)
         scene.GetComponent<SGL::PointLight>(handle).intensity = intensity;
         return;
     }
+
+    if (scene.HasComponent<SGL::SpotLight>(handle))
+    {
+        scene.GetComponent<SGL::SpotLight>(handle).intensity = intensity;
+        return;
+    }
 }
 
 SGL_API float GetLightIntensity(SGL_ENTITY handle)
@@ -331,6 +343,9 @@ SGL_API float GetLightIntensity(SGL_ENTITY handle)
 
     if (scene.HasComponent<SGL::PointLight>(handle))
         return scene.GetComponent<SGL::PointLight>(handle).intensity;
+
+    if (scene.HasComponent<SGL::SpotLight>(handle))
+        return scene.GetComponent<SGL::SpotLight>(handle).intensity;
 
     return 0.0f;
 }
@@ -350,6 +365,12 @@ SGL_API void SetLightShadow(SGL_ENTITY handle, SGL_BOOL shadow)
         scene.GetComponent<SGL::PointLight>(handle).shadow = shadow;
         return;
     }
+
+    if (scene.HasComponent<SGL::SpotLight>(handle))
+    {
+        scene.GetComponent<SGL::SpotLight>(handle).shadow = shadow;
+        return;
+    }
 }
 
 SGL_API SGL_BOOL GetLightShadow(SGL_ENTITY handle)
@@ -361,6 +382,9 @@ SGL_API SGL_BOOL GetLightShadow(SGL_ENTITY handle)
 
     if (scene.HasComponent<SGL::PointLight>(handle))
         return scene.GetComponent<SGL::PointLight>(handle).shadow;
+
+    if (scene.HasComponent<SGL::SpotLight>(handle))
+        return scene.GetComponent<SGL::SpotLight>(handle).shadow;
 
     return 0;
 }
@@ -380,6 +404,12 @@ SGL_API void SetLightSpecular(SGL_ENTITY handle, SGL_BOOL specular)
         scene.GetComponent<SGL::PointLight>(handle).specular = specular;
         return;
     }
+
+    if (scene.HasComponent<SGL::SpotLight>(handle))
+    {
+        scene.GetComponent<SGL::SpotLight>(handle).specular = specular;
+        return;
+    }
 }
 
 SGL_API SGL_BOOL GetLightSpecular(SGL_ENTITY handle)
@@ -392,16 +422,25 @@ SGL_API SGL_BOOL GetLightSpecular(SGL_ENTITY handle)
     if (scene.HasComponent<SGL::PointLight>(handle))
         return scene.GetComponent<SGL::PointLight>(handle).specular;
 
+    if (scene.HasComponent<SGL::SpotLight>(handle))
+        return scene.GetComponent<SGL::SpotLight>(handle).specular;
+
     return 0;
 }
 
-void SetLightRange(SGL_ENTITY handle, float range)
+SGL_API void SetLightRange(SGL_ENTITY handle, float range)
 {
     SGL::Scene& scene = SGL::GetSceneInstance();
 
     if (scene.HasComponent<SGL::PointLight>(handle))
     {
         scene.GetComponent<SGL::PointLight>(handle).range = range;
+        return;
+    }
+
+    if (scene.HasComponent<SGL::SpotLight>(handle))
+    {
+        scene.GetComponent<SGL::SpotLight>(handle).range = range;
         return;
     }
 }
@@ -413,7 +452,46 @@ SGL_API float GetLightRange(SGL_ENTITY handle)
     if (scene.HasComponent<SGL::PointLight>(handle))
         return scene.GetComponent<SGL::PointLight>(handle).range;
 
+    if (scene.HasComponent<SGL::SpotLight>(handle))
+        return scene.GetComponent<SGL::SpotLight>(handle).range;
+
     return 0.0f;
+}
+
+SGL_API void SetLightInnerAngle(SGL_ENTITY handle, float innerAngle)
+{
+    SGL::Scene& scene = SGL::GetSceneInstance();
+
+    if (!scene.HasComponent<SGL::SpotLight>(handle)) return;
+
+    scene.GetComponent<SGL::SpotLight>(handle).innerAngle = innerAngle;
+}
+
+SGL_API float GetLightInnerAngle(SGL_ENTITY handle)
+{
+    SGL::Scene& scene = SGL::GetSceneInstance();
+
+    if (!scene.HasComponent<SGL::SpotLight>(handle)) return 0.0f;
+
+    return scene.GetComponent<SGL::SpotLight>(handle).innerAngle;
+}
+
+SGL_API void SetLightOuterAngle(SGL_ENTITY handle, float outerAngle)
+{
+    SGL::Scene& scene = SGL::GetSceneInstance();
+
+    if (!scene.HasComponent<SGL::SpotLight>(handle)) return;
+
+    scene.GetComponent<SGL::SpotLight>(handle).outerAngle = outerAngle;
+}
+
+SGL_API float GetLightOuterAngle(SGL_ENTITY handle)
+{
+    SGL::Scene& scene = SGL::GetSceneInstance();
+
+    if (!scene.HasComponent<SGL::SpotLight>(handle)) return 0.0f;
+
+    return scene.GetComponent<SGL::SpotLight>(handle).outerAngle;
 }
 
 SGL_API SGL_BOOL IsEntityValid(SGL_ENTITY handle)

@@ -2,6 +2,7 @@
 
 #define MAX_DIR_LIGHTS 2
 #define MAX_POINT_LIGHTS 8
+#define MAX_SPOT_LIGHTS 8
 #define PI 3.14159265358979323846
 
 in vec2 fragTexCoord;
@@ -25,6 +26,15 @@ uniform vec3  pointLightPositions[MAX_POINT_LIGHTS];
 uniform vec3  pointLightColors[MAX_POINT_LIGHTS];
 uniform float pointLightIntensities[MAX_POINT_LIGHTS];
 uniform float pointLightRanges[MAX_POINT_LIGHTS];
+
+uniform int   spotLightCount;
+uniform vec3  spotLightPositions[MAX_SPOT_LIGHTS];
+uniform vec3  spotLightDirections[MAX_SPOT_LIGHTS];
+uniform vec3  spotLightColors[MAX_SPOT_LIGHTS];
+uniform float spotLightIntensities[MAX_SPOT_LIGHTS];
+uniform float spotLightRanges[MAX_SPOT_LIGHTS];
+uniform float spotLightCosInner[MAX_SPOT_LIGHTS];
+uniform float spotLightCosOuter[MAX_SPOT_LIGHTS];
 
 out vec4 finalColor;
 
@@ -61,6 +71,31 @@ vec3 ComputeLighting(vec3 N, vec3 albedo)
         atten = atten * atten;
 
         diffuse += BRDF(N, L, pointLightColors[i], pointLightIntensities[i]) * atten;
+    }
+
+    for (int i = 0; i < spotLightCount; i++)
+    {
+        vec3 toLight = spotLightPositions[i] - fragWorldPos;
+        float dist = length(toLight);
+
+        if (dist > spotLightRanges[i]) continue;
+
+        vec3 L = toLight / dist;
+
+        float spotCos = dot(normalize(-L), normalize(spotLightDirections[i]));
+
+        if (spotCos < spotLightCosOuter[i]) continue;
+
+        float spotAtten = clamp(
+            (spotCos - spotLightCosOuter[i]) / (spotLightCosInner[i] - spotLightCosOuter[i]),
+            0.0, 1.0);
+        spotAtten = spotAtten * spotAtten;
+
+        float norm = dist / spotLightRanges[i];
+        float atten = 1.0 - norm * norm;
+        atten = atten * atten;
+
+        diffuse += BRDF(N, L, spotLightColors[i], spotLightIntensities[i]) * atten * spotAtten;
     }
 
     return albedo * (ambient + diffuse / PI);

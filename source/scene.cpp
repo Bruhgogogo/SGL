@@ -633,6 +633,24 @@ namespace SGL
 
                 pointLightList.push_back(item);
             }
+
+            if (HasComponent<SpotLight>(handle))
+            {
+                const SpotLight& light = GetComponent<SpotLight>(handle);
+
+                if (light.range <= 0.0f) continue;
+
+                SpotLightItem item;
+                item.position = world.position;
+                item.direction = Vector3RotateByQuaternion({ 0.0f, 0.0f, -1.0f }, world.rotation);
+                item.color = rgb;
+                item.intensity = light.intensity;
+                item.range = light.range;
+                item.cosInner = cosf(light.innerAngle);
+                item.cosOuter = cosf(light.outerAngle);
+
+                spotLightList.push_back(item);
+            }
         }
     }
 
@@ -644,6 +662,11 @@ namespace SGL
     const std::vector<PointLightItem>& Scene::GetPointLightList() const
     {
         return pointLightList;
+    }
+
+    const std::vector<SpotLightItem>& Scene::GetSpotLightList() const
+    {
+        return spotLightList;
     }
 
     void Scene::SetEntityMeshID(int handle, int meshID)
@@ -720,4 +743,5 @@ namespace SGL
     SGL_INSTANTIATE_COMPONENT(MeshID);
     SGL_INSTANTIATE_COMPONENT(DirectionalLight);
     SGL_INSTANTIATE_COMPONENT(PointLight);
+    SGL_INSTANTIATE_COMPONENT(SpotLight);
 }

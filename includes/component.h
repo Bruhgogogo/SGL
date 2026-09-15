@@ -37,6 +37,16 @@ namespace SGL
         int   specular = 0;
     };
 
+    struct SpotLight
+    {
+        float intensity = 1.0f;
+        float range = 10.0f;
+        float innerAngle = 0.5236f;
+        float outerAngle = 0.7854f;
+        int   shadow = 0;
+        int   specular = 0;
+    };
+
     struct Visible
     {
         int value = 1;
@@ -130,5 +140,16 @@ namespace SGL
         Vector3 color;
         float   intensity;
         float   range;
+    };
+
+    struct SpotLightItem
+    {
+        Vector3 position;
+        Vector3 direction;
+        Vector3 color;
+        float   intensity;
+        float   range;
+        float   cosInner;
+        float   cosOuter;
     };
 }

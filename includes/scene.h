@@ -105,6 +105,7 @@ namespace SGL
         void CollectLightList();
         const std::vector<DirectionalLightItem>& GetDirectionalLightList() const;
         const std::vector<PointLightItem>& GetPointLightList() const;
+        const std::vector<SpotLightItem>& GetSpotLightList() const;
 
         void SetEntityPosition(int handle, float x, float y, float z);
         void GetEntityPosition(int handle, float* x, float* y, float* z);
@@ -145,6 +146,7 @@ namespace SGL
         std::vector<RenderItem> renderList;
         std::vector<DirectionalLightItem> directionalLightList;
         std::vector<PointLightItem> pointLightList;
+        std::vector<SpotLightItem> spotLightList;
 
         template <typename T>
         ComponentPool<T>& GetPool();
@@ -172,6 +174,7 @@ namespace SGL
     SGL_DECLARE_COMPONENT(MeshID);
     SGL_DECLARE_COMPONENT(DirectionalLight);
     SGL_DECLARE_COMPONENT(PointLight);
+    SGL_DECLARE_COMPONENT(SpotLight);
 
     // ====================================================================================================
     // APIs

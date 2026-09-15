@@ -21,11 +21,14 @@ int main()
     SetGroundAmbient(0.2f, 0.15f, 0.1f);
     SetSkyAmbient(0.5f, 0.6f, 0.8f);
 
-    int pointLight = CreatePointLight();
-    SetEntityPosition(pointLight, 0.0f, 1.0f, 0.0f);
-    SetEntityColor(pointLight, 255, 200, 120, 255);
-    SetLightIntensity(pointLight, 5.0f);
-    SetLightDistance(pointLight, 50.0f);
+    int spot = CreateSpotLight();
+    SetEntityPosition(spot, 0.0f, 8.0f, 4.0f);
+    SetEntityRotation(spot, DegToRad(-60.0f), 0.0f, 0.0f);
+    SetEntityColor(spot, 120, 180, 255, 255);
+    SetLightIntensity(spot, 5.0f);
+    SetLightRange(spot, 20.0f);
+    SetLightInnerAngle(spot, DegToRad(20.0f));
+    SetLightOuterAngle(spot, DegToRad(35.0f));
      
     int ground = CreateCube();
     SetEntityPosition(ground, 0.0f, -1.0f, 0.0f);
